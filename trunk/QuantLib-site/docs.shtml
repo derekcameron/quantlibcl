@@ -1,0 +1,78 @@
+<!--
+ $Id: docs.shtml 16754 2009-11-18 16:59:20Z lballabio $
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="en">
+<head>
+<!--#include virtual="qlmeta.inc"-->
+<meta name="author" content="StatPro Italia srl">
+<meta name="copyright" content="StatPro Italia srl (c) 2004">
+<meta name="description" content="QuantLib Documentation">
+<title>QuantLib Documentation</title>
+</head>
+<body>
+<div id="container">
+<!--#include virtual="header.inc"-->
+<div id="menu">
+<!--#include virtual="usermenu.inc"-->
+</div>
+<div id="content">
+
+<h1 class="center">Official QuantLib Documentation</h1>
+<ul>
+<li><strong>QuantLib reference manual</strong> [<a href=
+"reference/index.html">HTML</a>]
+</ul>
+The reference manual is also available for offline reading from the
+SourceForge <a href=
+"http://sourceforge.net/project/showfiles.php?group_id=12740">download
+page</a>.
+
+<h1 class="center">Other information</h1>
+
+<h2 class="center">Papers</h2>
+<ul>
+<li><strong>Option Engine: A Grid-Enabled Software Package to Evaluate
+Financial Options</strong> [<a href=
+"http://www.hpcwire.com/features/Option-Engine-A-Grid-Enabled-Software-Package-to-Evaluate-Financial-Options-59669252.html?viewAll=y">HTML</a>]<br>
+Francesca Mariani, Maria Cristina Recchioni, Francesco Zirilli<br>
+HPCwire (September 2009)</li>
+<li><strong>Bootstrapping the Illiquidity: Multiple Yield Curves
+Construction for Market Coherent Forward Rates Estimation</strong>
+[<a href= "http://ssrn.com/abstract=1371311">abstract</a>]<br>
+Ferdinando Ametrano, Marco Bianchetti<br>
+In <a href="http://riskbooks.com/Quantitative%20Analysis/modelling-interest-rates-.php"><i>Modelling
+Interest Rates</i></a>, Fabio Mercurio, ed., Risk Books, Incisive
+Media, 2009.</li>
+<li><strong>Smooth Simultaneous Calibration of the LMM to Caplets and Coterminal Swaptions</strong>
+[<a href= "http://ssrn.com/abstract=1092665">abstract/download</a>]<br>
+Ferdinando Ametrano, Mark S. Joshi (2008)</li>
+<li><strong>Why Use QuantLib?</strong> [<a href=
+"http://www.quantlib.co.uk/publications/quantlib.pdf">PDF</a>]<br>
+Firth, N.P. (2004)</li>
+</ul>
+
+<h2 class="center">Books</h2>
+<ul>
+<li><strong>Implementing QuantLib</strong> (in progress) [<a href=
+"http://sites.google.com/site/luigiballabio/qlbook">web page</a>]<br>
+Ballabio, L.</li>
+</ul>
+
+<h2 class="center">Press</h2>
+<ul>
+<li><strong>Four years of open source financial models</strong> [<a href=
+"press/WilmottQuantLib.pdf">PDF</a>]<br>
+Wilmott Magazine (September 2004)</li>
+</ul>
+
+</div>
+
+<div class="footer">
+<!--#include virtual="footer.inc"-->
+</div>
+
+</div>
+
+</body>
+</html>
