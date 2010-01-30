@@ -1,4 +1,6 @@
+#summary General information about QuantLibCL.
 #labels Featured,Phase-Requirements
+
 = Introduction =
 
 This project explores methods to offload certain quantitative finance computations to a GPU.
