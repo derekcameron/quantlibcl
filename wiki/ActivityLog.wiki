@@ -1,6 +1,7 @@
 #summary QuantLibCL development activity log.
 
 *30 January 2010*
+  * Created an autotools project for QuantLibCL-test
   * Updated QuantLibCL wiki
   * Created new QuantLibCL-test folder in SVN
   * Researched existing Monte Carlo pricing engines
