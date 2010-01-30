@@ -2,7 +2,7 @@
 
 = Parallel computing architectures =
 
-[http://www.occf.ox.ac.uk/slides/godart_slides.pdf High-performance parallel computing in finance]
+  * [http://www.occf.ox.ac.uk/slides/godart_slides.pdf High-performance parallel computing in finance]
 
 = GPGPUs in finance =
-[http://people.maths.ox.ac.uk/gilesm/hpc/ Using NVIDIA GPUs for computational finance]
+  * [http://people.maths.ox.ac.uk/gilesm/hpc/ Using NVIDIA GPUs for computational finance]
