@@ -19,7 +19,7 @@ While actual performance gains have not yet been determined, the goal of this pr
 
 = Technical specifications =
   * Target architecture:  Nvidia Fermi architecture (Compute Capability 3.0)
-  ** Secondary architecture:  Nvidia Compute Capability 1.1, 2.0
-  ** Secondary architecture:  AMD ATI Stream
+   * Secondary architecture:  Nvidia Compute Capability 1.1, 2.0
+   * Secondary architecture:  AMD ATI Stream
   * Target language:  OpenCL
-  ** Secondary language:  CUDA
+   * Secondary language:  CUDA
