@@ -1,2 +1,4 @@
   * [Info Project information]
+  * [Design Project design]
+   * [AccelerationCandidates Acceleration candidates]
   * [Resources External resources]
