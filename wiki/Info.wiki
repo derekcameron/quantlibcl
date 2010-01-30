@@ -1,5 +1,5 @@
 #summary General information about QuantLibCL.
-#labels Featured
+#labels Featured,Phase-Requirements
 
 = Introduction =
 
