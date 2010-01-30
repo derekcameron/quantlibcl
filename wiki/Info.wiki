@@ -23,6 +23,3 @@ While actual performance gains have not yet been determined, the goal of this pr
   ** Secondary architecture:  AMD ATI Stream
   * Target language:  OpenCL
   ** Secondary language:  CUDA
-
-= Links =
-  * [http://www.quantlib.org/ QuantLib]
