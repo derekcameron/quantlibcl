@@ -1,4 +1,5 @@
   * [Info Project information]
   * Project design
    * [AccelerationCandidates Acceleration candidates]
+  * [ActivityLog Development activity log]
   * [Resources External resources]
