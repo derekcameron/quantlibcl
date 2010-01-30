@@ -1,8 +1,13 @@
 #summary External resources useful in this project.
 
-= Parallel computing architectures =
+= Projects =
+
+  * [http://www.quantlib.org/ QuantLib]
+
+= Research =
+== Parallel computing architectures ==
 
   * [http://www.occf.ox.ac.uk/slides/godart_slides.pdf High-performance parallel computing in finance]
 
-= GPGPUs in finance =
+== GPGPUs in finance ==
   * [http://people.maths.ox.ac.uk/gilesm/hpc/ Using NVIDIA GPUs for computational finance]
