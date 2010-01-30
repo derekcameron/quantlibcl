@@ -1,4 +1,5 @@
 #summary General information about QuantLibCL.
+#labels Featured
 
 = Introduction =
 
