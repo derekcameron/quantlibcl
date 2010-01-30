@@ -4,6 +4,8 @@
 
   * [http://www.quantlib.org/ QuantLib]
 
+----
+
 = Research =
 == Parallel computing architectures ==
 
