@@ -25,4 +25,4 @@ While actual performance gains have not yet been determined, the goal of this pr
   ** Secondary language:  CUDA
 
 = Links =
-[http://www.quantlib.org/ QuantLib]
+  * [http://www.quantlib.org/ QuantLib]
