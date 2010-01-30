@@ -1,0 +1,7 @@
+#summary External resources useful in this project.
+
+= Parallel computing architectures =
+
+[http://www.occf.ox.ac.uk/slides/godart_slides.pdf High-performance parallel computing in finance]
+
+= GPGPUs in finance =
