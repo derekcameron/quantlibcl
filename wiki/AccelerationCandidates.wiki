@@ -8,6 +8,6 @@ By their very nature, many of the quantitative problems facing the financial sec
   * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_discrete_arithmetic_a_p_engine.html MCDiscreteArithmeticAPEngine] - Monte Carlo pricing engine for discrete arithmetic average price Asian
 
 *Vanilla option engines*:
-  * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_american_engine.html MCAmericanEngine] - A Monte Carlo American option pricing engine
+  * [MCAmericanEngine] - A Monte Carlo American option pricing engine
   * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_vanilla_engine.html MCVanillaEngine] - A pricing engine for vanilla options using Monte Carlo simulation
   * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_european_engine.html MCEuropeanEngine] - A European option pricing engine using Monte Carlo simulation
