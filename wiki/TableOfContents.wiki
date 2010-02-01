@@ -2,7 +2,8 @@
   * Project design
    * [AccelerationCandidates Acceleration candidates]
     * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_discrete_arithmetic_a_p_engine.html MCDiscreteArithmeticAPEngine]
-    * [MCAmericanEngine]
+    * [MCLongstaffSchwartzEngine]
+     * [MCAmericanEngine]
     * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_vanilla_engine.html MCVanillaEngine]
     * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_european_engine.html MCEuropeanEngine]
   * [ActivityLog Development activity log]
