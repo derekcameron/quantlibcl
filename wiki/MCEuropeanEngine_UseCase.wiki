@@ -1,0 +1,3 @@
+#summary MCEuropeanEngine use case
+
+To use the MCEuropeanEngine, one simply makes a call to the [http://quantlib.org/reference/class_quant_lib_1_1_make_m_c_european_engine.html MakeMCEuropeanEngine() method].  The MakeMCEuropeanEngine() method takes one argument, a boost shared pointer to an instance of the [http://quantlib.org/reference/class_quant_lib_1_1_generalized_black_scholes_process.html GeneralizedBlackScholesProcess class] (or one of its inherited classes).
