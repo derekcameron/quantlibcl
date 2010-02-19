@@ -3,6 +3,8 @@
    * [AccelerationCandidates Acceleration candidates]
     * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_discrete_arithmetic_a_p_engine.html MCDiscreteArithmeticAPEngine]
     * [MCLongstaffSchwartzEngine]
+     * [MCEuropeanEngine]
+      * [Use case]
      * [MCAmericanEngine]
      * [MCAmericanBasketEngine]
     * [http://quantlib.org/reference/class_quant_lib_1_1_m_c_vanilla_engine.html MCVanillaEngine]
