@@ -41,7 +41,7 @@ ARGUMENTS:  tolerance, maxSamples, minSamples
 2. If sampleNumber is less than minSamples, generate samples until sampleNumber >= minSamples
 3. Estimate the maximum error in our sample set
 4. Loop until maximum error <= tolerance
-     a.  Estimate how many more samples are needed = samplesNeeded = max(currentNumberOfSamples*currentSampleError^2/tolerance^2*0.8-currentNumberOfSamples, minSamples)
+     a.  samplesNeeded = max(currentNumberOfSamples*currentSampleError^2/tolerance^2*0.8-currentNumberOfSamples, minSamples)
      b.  If samplesNeeded > maxSamples, samplesNeeded = maxSamples - currentNumberOfSamples
      c.  Generate samplesNeeded new samples
      d.  Recalculate the error of the sample set
