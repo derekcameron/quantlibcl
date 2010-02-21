@@ -27,3 +27,27 @@ europeanOption.setPricingEngine(mcengine1);
 // Real errorEstimate = europeanOption.errorEstimate();
 std::cout << "NPV = " << europeanOption.NPV() << endl;
 }}}
+
+All the magic is done in the call to europeanOption.NPV().  Execution follows the following path:
+
+Instrument::NPV() -> Instrument::calculate() -> LazyObject::calculate() -> Instrument::performCalculations() -> MCVanillaEngine::calculate() -> McSimulation<MC,RNG,S>::value()
+
+The McSimulation<MC,RNG,S>::value() method is where the actual Monte Carlo simulation is performed, and all the dozens of method calls up to this point were simply preparing us for this step.  The pseudocode for this method is:
+
+{{{
+ARGUMENTS:  tolerance, maxSamples, minSamples
+
+1. Determine a number of samples to compute (sampleNumber)
+2. If sampleNumber is less than minSamples, generate samples until sampleNumber >= minSamples
+3. Estimate the maximum error in our sample set
+4. Loop until maximum error <= tolerance
+     a.  Estimate how many more samples are needed = samplesNeeded = max(currentNumberOfSamples*currentSampleError^2/tolerance^2*0.8-currentNumberOfSamples, minSamples)
+     b.  If samplesNeeded > maxSamples, samplesNeeded = maxSamples - currentNumberOfSamples
+     c.  Generate samplesNeeded new samples
+     d.  Recalculate the error of the sample set
+5.  value = mean of the sample set
+6.  Return value
+}}} 
+
+==Characteristics of a MonteCarloModel==
+  * Components include path generator, path pricer, and sample accumulator
