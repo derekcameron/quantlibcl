@@ -1,0 +1,1 @@
+Runs OpenCL tests and compares results with non-OpenCL versions

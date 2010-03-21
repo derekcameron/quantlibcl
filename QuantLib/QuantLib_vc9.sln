@@ -1,5 +1,5 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QuantLib", "QuantLib_vc9.vcproj", "{AD0A27DA-91DA-46A2-ACBD-296C419ED3AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testsuite", "test-suite\testsuite_vc9.vcproj", "{A613045C-34AF-4706-AA3C-730C92524F74}"
@@ -71,6 +71,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MarketModels", "Examples\Ma
 	ProjectSection(ProjectDependencies) = postProject
 		{AD0A27DA-91DA-46A2-ACBD-296C419ED3AA} = {AD0A27DA-91DA-46A2-ACBD-296C419ED3AA}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenCL", "Examples\OpenCL\OpenCL_vc9.vcproj", "{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -324,6 +326,22 @@ Global
 		{47CE2A41-091A-42A3-B40D-F6F0DD689349}.Release|Win32.Build.0 = Release|Win32
 		{47CE2A41-091A-42A3-B40D-F6F0DD689349}.Release|x64.ActiveCfg = Release|x64
 		{47CE2A41-091A-42A3-B40D-F6F0DD689349}.Release|x64.Build.0 = Release|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug (static runtime)|Win32.ActiveCfg = Debug (static runtime)|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug (static runtime)|Win32.Build.0 = Debug (static runtime)|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug (static runtime)|x64.ActiveCfg = Debug (static runtime)|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug (static runtime)|x64.Build.0 = Debug (static runtime)|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug|Win32.Build.0 = Debug|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug|x64.ActiveCfg = Debug|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Debug|x64.Build.0 = Debug|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release (static runtime)|Win32.ActiveCfg = Release (static runtime)|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release (static runtime)|Win32.Build.0 = Release (static runtime)|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release (static runtime)|x64.ActiveCfg = Release (static runtime)|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release (static runtime)|x64.Build.0 = Release (static runtime)|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release|Win32.ActiveCfg = Release|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release|Win32.Build.0 = Release|Win32
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release|x64.ActiveCfg = Release|x64
+		{0BC36A77-B4D5-4826-924B-C4A53EFEB40A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
