@@ -4561,6 +4561,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ql\utilities\opencl.hpp"
+				>
+			</File>
+			<File
 				RelativePath="ql\utilities\steppingiterator.hpp"
 				>
 			</File>

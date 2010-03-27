@@ -83,6 +83,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-mt.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -182,6 +183,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-$(PlatformName)-mt.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -280,6 +282,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-mt-s.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -379,6 +382,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-$(PlatformName)-mt-s.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -475,6 +479,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-mt-sgd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -573,6 +578,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-$(PlatformName)-mt-sgd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -670,6 +676,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-mt-gd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -768,6 +775,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="OpenCL.lib"
 				OutputFile=".\bin\OpenCL-vc90-$(PlatformName)-mt-gd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
