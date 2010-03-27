@@ -31,6 +31,7 @@
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 #include <ql/termstructures/volatility/equityfx/blackvariancecurve.hpp>
+#include <ql/utilities/opencl.hpp>
 
 namespace QuantLib {
 
@@ -49,10 +50,12 @@ namespace QuantLib {
         MakeMCEuropeanEngineOCL& withMaxSamples(Size samples);
         MakeMCEuropeanEngineOCL& withSeed(BigNatural seed);
         MakeMCEuropeanEngineOCL& withAntitheticVariate(bool b = true);
+		MakeMCEuropeanEngineOCL& withOclDevice(boost::shared_ptr<OclDevice> oclDevice);
         // conversion to pricing engine
         operator boost::shared_ptr<PricingEngine>() const;
       private:
         boost::shared_ptr<GeneralizedBlackScholesProcess> process_;
+		boost::shared_ptr<OclDevice> oclDevice_;
         bool antithetic_;
         Size steps_, stepsPerYear_, samples_, maxSamples_;
         Real tolerance_;
@@ -133,6 +136,13 @@ namespace QuantLib {
         return *this;
     }
 
+	template <class RNG, class S>
+	inline MakeMCEuropeanEngineOCL<RNG,S>&
+	MakeMCEuropeanEngineOCL<RNG,S>::withOclDevice(boost::shared_ptr<OclDevice> oclDevice) {
+		oclDevice_ = oclDevice;
+		return *this;
+	}
+
     template <class RNG, class S>
     inline
     MakeMCEuropeanEngineOCL<RNG,S>::operator boost::shared_ptr<PricingEngine>()
@@ -141,6 +151,7 @@ namespace QuantLib {
                    "number of steps not given");
         QL_REQUIRE(steps_ == Null<Size>() || stepsPerYear_ == Null<Size>(),
                    "number of steps overspecified");
+
         return boost::shared_ptr<PricingEngine>(new
             MCEuropeanEngine<RNG,S>(process_,
                                     steps_,

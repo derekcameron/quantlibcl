@@ -146,8 +146,25 @@ int main(int, char* []) {
         timeSteps = 1;
         method = "OpenCL MC (crude)";
         Size mcSeed2 = 42;
-        boost::shared_ptr<PricingEngine> mcengine2;
-        mcengine2 = MakeMCEuropeanEngineOCL<PseudoRandom>(bsmProcess)
+		boost::shared_ptr<OclDevice> ocldevice1;
+		ocldevice1 = MakeOclDevice()
+			.withDeviceType(CL_DEVICE_TYPE_GPU);
+		
+		//CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
+		//cl::Program::Sources source(1, std::make_pair(helloStr,strlen(helloStr)));
+		//cl::Program program_ = cl::Program(context, source);
+		//program_.build(devices);
+ 
+		//cl::Kernel kernel(program_, "hello", &err);
+ 
+		//cl::CommandQueue queue(context, devices[0], 0, &err);
+		//cl::KernelFunctor func = kernel.bind(queue, cl::NDRange(4, 4), cl::NDRange(2, 2));
+ 
+		//func().wait();
+		//END CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
+
+		boost::shared_ptr<PricingEngine> mcengine2;
+		mcengine2 = MakeMCEuropeanEngineOCL<PseudoRandom>(bsmProcess)
             .withSteps(timeSteps)
             .withAbsoluteTolerance(0.02)
             .withSeed(mcSeed2);
