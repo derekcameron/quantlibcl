@@ -50,7 +50,15 @@ if test [ -n "$ql_boost_lib_path" ] ; then
    AC_SUBST([BOOST_LIB],["-L${ql_boost_lib_path}"])
    AC_SUBST([LDFLAGS],["${LDFLAGS} -L${ql_boost_lib_path}"])
 fi
-
+AC_ARG_WITH([opencl-include],
+			AC_HELP_STRING([--with-opencl-include=INCLUDE_PATH],
+							[Supply the location of the OpenCL header files]),
+			[ql_opencl_include_path="`cd ${withval} 2>/dev/null && pwd`"],
+			[ql_opencl_include_path=""])
+if test [ -n "$ql_opencl_include_path" ] ; then
+	AC_SUBST([OPENCL_INCLUDE],["-I${ql_opencl_include_path}"])
+	AC_SUBST([CPPFLAGS],["${CPPFLAGS} -I${ql_opencl_include_path}"])
+fi
 
 # Continue setup
 
@@ -81,6 +89,9 @@ QL_CHECK_CONSTANT([M_LN2],[double],[cmath],
                   [0.693147180559945309417],[ln(2)])
 
 QL_CHECK_ASINH
+
+# Check for OpenCL headers
+QL_CHECK_OPENCL_CPP_BINDINGS
 
 # Check for Boost components
 QL_CHECK_BOOST
@@ -424,6 +435,7 @@ AC_CONFIG_FILES([
     Examples/FittedBondCurve/Makefile
     Examples/FRA/Makefile
     Examples/MarketModels/Makefile
+    Examples/OpenCL/Makefile
     Examples/Replication/Makefile
     Examples/Repo/Makefile
     Examples/Swap/Makefile

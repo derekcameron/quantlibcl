@@ -51,6 +51,20 @@ AC_DEFUN([QL_CHECK_ASINH],
 
 # QL_CHECK_BOOST_DEVEL
 # --------------------
+# Check whether the OpenCL C++ bindings are available
+AC_DEFUN([QL_CHECK_OPENCL_CPP_BINDINGS],
+[AC_MSG_CHECKING([for OpenCL C++ bindings])
+ AC_TRY_COMPILE(
+    [@%:@include <CL/cl.hpp>],
+    [],
+    [AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])
+     AC_MSG_ERROR([OpenCL C++ bindings not found])
+    ])
+])
+
+# QL_CHECK_BOOST_DEVEL
+# --------------------
 # Check whether the Boost headers are available
 AC_DEFUN([QL_CHECK_BOOST_DEVEL],
 [AC_MSG_CHECKING([for Boost development files])
