@@ -49,7 +49,7 @@ AC_DEFUN([QL_CHECK_ASINH],
     ])
 ])
 
-# QL_CHECK_BOOST_DEVEL
+# QL_CHECK_OPENCL_CPP_BINDINGS
 # --------------------
 # Check whether the OpenCL C++ bindings are available
 AC_DEFUN([QL_CHECK_OPENCL_CPP_BINDINGS],
