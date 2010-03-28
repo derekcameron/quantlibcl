@@ -33,10 +33,12 @@
 #endif
 
 #include <boost/timer.hpp>
+#include <fstream>
 #include <iostream>
 #include <iomanip>
 
 using namespace QuantLib;
+using std::ifstream;
 
 #if defined(QL_ENABLE_SESSIONS)
 namespace QuantLib {
@@ -149,7 +151,16 @@ int main(int, char* []) {
 		boost::shared_ptr<OclDevice> ocldevice1;
 		ocldevice1 = MakeOclDevice()
 			.withDeviceType(CL_DEVICE_TYPE_GPU);
-		
+
+		//Load the kernels and compile them
+		std::ifstream file("kernels.cl");
+		std::string kernels(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+		file.close();
+
+		cl::Program::Sources sources(1, std::make_pair(kernels.c_str(), kernels.length()+1));
+
+		ocldevice1->loadSources(sources);
+
 		//CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
 		//cl::Program::Sources source(1, std::make_pair(helloStr,strlen(helloStr)));
 		//cl::Program program_ = cl::Program(context, source);

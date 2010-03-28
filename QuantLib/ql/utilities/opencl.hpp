@@ -47,20 +47,36 @@ namespace QuantLib {
 		OclDevice(
 			// any required components should be passed in here
 			const cl::Context context,
-			const cl::Device device
+			const cl::vector<cl::Device> devices,
+			const cl::Device device,
+			const cl::CommandQueue commandQueue
 		);
+		OclDevice& loadSources(const cl::Program::Sources &sources);
 	private:
 		cl::Context context_;
+		cl::vector<cl::Device> devices_;
 		cl::Device device_;
+		cl::CommandQueue commandQueue_;
+		cl::vector<cl::Program> programs_;
 	};
 
 	// constructor
 	inline OclDevice::OclDevice(
 		const cl::Context context,
-		const cl::Device device
+		const cl::vector<cl::Device> devices,
+		const cl::Device device,
+		const cl::CommandQueue commandQueue
 		) {
 		context_ = context;
+		devices_ = devices;
 		device_ = device;
+		commandQueue_ = commandQueue;
+	}
+
+	inline OclDevice& OclDevice::loadSources(const cl::Program::Sources &sources) {
+		programs_.push_back(cl::Program(context_, sources));
+		programs_.back().build(devices_,"");
+		return *this;
 	}
 
 	class MakeOclDevice {
@@ -96,13 +112,17 @@ namespace QuantLib {
 		//And a list of all devices matching that context
 		cl::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 
+		//Lastly, create a command queue for device 0
+		cl::CommandQueue commandQueue = cl::CommandQueue(context,devices[0]);
+
 		//And if all the creation goes according to plan, return a shared pointer to the created object
-		//By default, use the first device
 		return boost::shared_ptr<OclDevice>(
 			new OclDevice(
 				//Insert any required components here
 				context,
-				devices[0]
+				devices,
+				devices[0],
+				commandQueue
 			)
 		);
     }
