@@ -12,6 +12,7 @@ SUBDIRS = \
     FittedBondCurve \
     FRA \
     MarketModels \
+    OpenCL \
     Replication \
     Repo \
     Swap
