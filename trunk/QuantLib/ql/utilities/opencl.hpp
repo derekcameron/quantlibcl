@@ -84,8 +84,14 @@ namespace QuantLib {
         /*QL_REQUIRE(steps_ == Null<Size>() || stepsPerYear_ == Null<Size>(),
                    "number of steps overspecified");*/
 		
+		//Find the available platforms and select one
+		cl::vector<cl::Platform> allPlatforms;
+		cl::Platform::get(&allPlatforms);
+		cl::Platform targetPlatform = allPlatforms[0];
+
 		//Get a context matching deviceType_
-		cl::Context context(deviceType_);
+		cl_context_properties cprops[3] = { CL_CONTEXT_PLATFORM, (cl_context_properties)targetPlatform(), 0 };
+		cl::Context context = cl::Context(deviceType_, cprops);
 
 		//And a list of all devices matching that context
 		cl::vector<cl::Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
