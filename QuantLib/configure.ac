@@ -59,6 +59,17 @@ if test [ -n "$ql_opencl_include_path" ] ; then
 	AC_SUBST([OPENCL_INCLUDE],["-I${ql_opencl_include_path}"])
 	AC_SUBST([CPPFLAGS],["${CPPFLAGS} -I${ql_opencl_include_path}"])
 fi
+AC_ARG_WITH([opencl-lib],
+			AC_HELP_STRING([--with-opencl-library=LIB_PATH],
+							[Supply the location of the OpenCL library]),
+			[ql_opencl_lib_path="`cd ${withval} 2>/dev/null && pwd`"],
+			[ql_opencl_lib_path=""])
+if test [ -n "$ql_opencl_lib_path" ] ; then
+	AC_SUBST([OPENCL_LIB],["-L${ql_opencl_lib_path}"])
+	AC_SUBST([LDFLAGS],["${LDFLAGS} -L${ql_opencl_lib_path}"])
+else
+	AC_SUBST([LDFLAGS],["${LDFLAGS} -lOpenCL"])
+fi
 
 # Continue setup
 
