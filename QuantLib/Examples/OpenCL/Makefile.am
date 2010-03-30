@@ -9,8 +9,10 @@ noinst_PROGRAMS = OpenCL
 endif
 OpenCL_SOURCES = OpenCL.cpp
 OpenCL_LDADD = ../../ql/libQuantLib.la
+OpenCL_LDFLAGS = -lpthread
 
 EXTRA_DIST = \
+	kernels.cl \
     OpenCL.dev \
     OpenCL_vc9.vcproj \
     ReadMe.txt
