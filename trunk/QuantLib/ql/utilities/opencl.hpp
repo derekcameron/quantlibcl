@@ -38,6 +38,8 @@
 #include <CL/cl.hpp>
 #endif
 
+#include <stdarg.h>
+
 
 namespace QuantLib {
 
@@ -51,13 +53,20 @@ namespace QuantLib {
 			const cl::Device device,
 			const cl::CommandQueue commandQueue
 		);
-		OclDevice& loadSources(const cl::Program::Sources &sources);
+		//! Load and compile OpenCL sources on this device
+		unsigned int loadSources(const cl::Program::Sources &sources);
+		unsigned int loadKernel(const size_t programIndex, const char* kernelName, size_t argsNum, ...);
+		unsigned int allocateBuffer(void* ptr, const size_t bufferSize);
+		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads);
 	private:
 		cl::Context context_;
 		cl::vector<cl::Device> devices_;
 		cl::Device device_;
 		cl::CommandQueue commandQueue_;
 		cl::vector<cl::Program> programs_;
+		cl::vector<cl::Buffer> buffers_;
+		cl::vector<cl::Kernel> kernels_;
+		cl::vector<cl::Event> events_;
 	};
 
 	// constructor
@@ -73,10 +82,44 @@ namespace QuantLib {
 		commandQueue_ = commandQueue;
 	}
 
-	inline OclDevice& OclDevice::loadSources(const cl::Program::Sources &sources) {
+	inline unsigned int OclDevice::loadSources(const cl::Program::Sources &sources) {
 		programs_.push_back(cl::Program(context_, sources));
 		programs_.back().build(devices_,"");
-		return *this;
+		return programs_.size() - 1;
+	}
+
+	inline unsigned int OclDevice::loadKernel(const size_t programIndex, const char* kernelName, size_t argsNum, ...) {
+		// Load the kernel
+		kernels_.push_back(cl::Kernel(programs_[programIndex], kernelName));
+
+		// Set arguments for the kernel
+		va_list ap;
+		va_start(ap, argsNum);
+		for(int i = 0; i < argsNum; i++) {
+			kernels_.back().setArg(i, buffers_[va_arg(ap, unsigned int)]);
+		}
+		va_end(ap);
+
+		return kernels_.size() - 1;
+	}
+
+	inline unsigned int OclDevice::allocateBuffer(void* ptr, const size_t bufferSize) {
+		buffers_.push_back(cl::Buffer(context_, CL_MEM_USE_HOST_PTR, bufferSize, ptr));
+		return buffers_.size() - 1;
+	}
+
+	inline unsigned int OclDevice::launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads) {
+		events_.push_back(cl::Event());
+		commandQueue_.enqueueNDRangeKernel(
+				kernels_[kernelHandle],
+				cl::NullRange,
+				cl::NDRange(numberOfThreads),
+				cl::NDRange(1, 1),
+				NULL,
+				&events_.back()
+			);
+
+		return events_.size() - 1;
 	}
 
 	class MakeOclDevice {
