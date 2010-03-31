@@ -137,9 +137,10 @@ int main(int, char* []) {
             .withSeed(mcSeed);
         europeanOption.setPricingEngine(mcengine1);
         // Real errorEstimate = europeanOption.errorEstimate();
+        Real npv = europeanOption.NPV();
         std::cout << std::setw(widths[0]) << std::left << method
                   << std::fixed
-                  << std::setw(widths[1]) << std::left << europeanOption.NPV()
+                  << std::setw(widths[1]) << std::left << npv
                   << std::setw(widths[2]) << std::left << "N/A"
                   << std::setw(widths[3]) << std::left << "N/A"
                   << std::endl;
