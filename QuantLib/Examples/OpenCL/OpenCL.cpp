@@ -48,11 +48,12 @@ namespace QuantLib {
 }
 #endif
 
+#define OCL_THREAD_TOTAL 1024
+
 
 int main(int, char* []) {
 
     try {
-
         boost::timer timer;
         std::cout << std::endl;
 
@@ -124,6 +125,45 @@ int main(int, char* []) {
         // options
         VanillaOption europeanOption(payoff, europeanExercise);
 
+        //OpenCL test simulation
+		boost::shared_ptr<OclDevice> ocldevice1;
+		ocldevice1 = MakeOclDevice()
+			.withDeviceType(CL_DEVICE_TYPE_GPU);
+
+		//Load the kernels and compile them
+		std::ifstream file("kernels.cl");
+		std::string kernels(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+		file.close();
+
+		// Print the OpenCL source code to the terminal
+		//std::cout << kernels << std::endl;
+
+		cl::Program::Sources sources(1, std::make_pair(kernels.c_str(), kernels.length()+1));
+
+		size_t sourcesIndex = ocldevice1->loadSources(sources);
+
+    	size_t outH[OCL_THREAD_TOTAL];
+
+		unsigned int bufferHandle = ocldevice1->allocateBuffer(&outH, sizeof(outH));
+
+		unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1", 1, bufferHandle);
+
+		unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, OCL_THREAD_TOTAL);
+
+
+
+		//CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
+		//cl::CommandQueue queue(context, devices[0], 0, &err);
+		//cl::KernelFunctor func = kernel.bind(queue, cl::NDRange(4, 4), cl::NDRange(2, 2));
+
+		//func().wait();
+		//END CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
+
+
+
+
+
+
 		// Analytic formulas:
 
         // Monte Carlo Method: MC (crude)
@@ -149,32 +189,6 @@ int main(int, char* []) {
         timeSteps = 1;
         method = "OpenCL MC (crude)";
         Size mcSeed2 = 42;
-		boost::shared_ptr<OclDevice> ocldevice1;
-		ocldevice1 = MakeOclDevice()
-			.withDeviceType(CL_DEVICE_TYPE_GPU);
-
-		//Load the kernels and compile them
-		std::ifstream file("kernels.cl");
-		std::string kernels(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
-		file.close();
-
-		cl::Program::Sources sources(1, std::make_pair(kernels.c_str(), kernels.length()+1));
-
-		ocldevice1->loadSources(sources);
-
-		//CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
-		//cl::Program::Sources source(1, std::make_pair(helloStr,strlen(helloStr)));
-		//cl::Program program_ = cl::Program(context, source);
-		//program_.build(devices);
- 
-		//cl::Kernel kernel(program_, "hello", &err);
- 
-		//cl::CommandQueue queue(context, devices[0], 0, &err);
-		//cl::KernelFunctor func = kernel.bind(queue, cl::NDRange(4, 4), cl::NDRange(2, 2));
- 
-		//func().wait();
-		//END CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
-
 		boost::shared_ptr<PricingEngine> mcengine2;
 		mcengine2 = MakeMCEuropeanEngineOCL<PseudoRandom>(bsmProcess)
             .withSteps(timeSteps)
@@ -202,6 +216,7 @@ int main(int, char* []) {
             std::cout << minutes << " m ";
         std::cout << std::fixed << std::setprecision(0)
                   << seconds << " s\n" << std::endl;
+
         return 0;
 
     } catch (std::exception& e) {

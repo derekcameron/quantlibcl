@@ -17,3 +17,43 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
+#pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
+
+// Hello World kernel
+//__constant char hw[] = "Hello World\n";
+//__kernel void helloWorld(__global char* out)
+//{
+//	size_t tid = get_global_id(0);
+//	out[tid] = hw[tid];
+//}
+
+// Testing kernel
+__kernel void oclTest1(__global size_t* out)
+{
+	size_t tid = get_global_id(0);
+	out[tid] = tid;
+}
+
+// Pseudocode for 1-factor MonteCarlo simulation code, assuming no control-variation path pricer
+// adopted from Quantlib : mcsimulation.hpp
+//__kernel mc_calculate(const double requiredTolerance) {
+//	double order, errorEstimate;
+//	unsigned __int64 sambleNumber, nextBatch, minSamples = 1023, maxSamples = 2147483647;
+
+//	sampleNumber = getCurrentSampleNumber();
+//	if(sampleNumber <minSamples) {
+//		generateSamples(minSamples - sampleNumber);
+//		sampleNumber = getCurrentSampleNumber();
+//	}
+//	errorEstimate = generateErrorEstimate();
+//	while(errorEstimate > requiredTolerance) {
+//		order = (errorEstimate * errorEstimate) / (requiredTolerance * requiredTolerance);
+//		nextBatch = max((double)sampleNumber * order * 0.8 - (double)sampleNumber, (double)minSamples);
+//		nextBatch = min(nextBatch,maxSamples-sampleNumber);
+//		sampleNumber += nextBatch;
+//		generateSamples(nextBatch);
+//		errorEstimate = generateErrorEstimate();
+//	}
+
+//	return averageOfSamples();
+//}
