@@ -36,6 +36,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <inttypes.h>
 
 using namespace QuantLib;
 using std::ifstream;
@@ -56,6 +57,49 @@ int main(int, char* []) {
     try {
         boost::timer timer;
         std::cout << std::endl;
+
+        //OpenCL test 1
+        std::cout << "Running OpenCL test 1 with " << OCL_THREAD_TOTAL << " threads..." << std::endl;
+		boost::shared_ptr<OclDevice> ocldevice1;
+		ocldevice1 = MakeOclDevice()
+			.withDeviceType(CL_DEVICE_TYPE_GPU);
+
+		//Load the kernels and compile them
+		std::ifstream file("kernels.cl");
+		std::string kernels(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
+		file.close();
+
+		cl::Program::Sources sources(1, std::make_pair(kernels.c_str(), kernels.length()+1));
+
+		size_t sourcesIndex = ocldevice1->loadSources(sources);
+
+    	uint64_t outH[OCL_THREAD_TOTAL];
+    	for(int i = 0; i < OCL_THREAD_TOTAL; i++)
+    		outH[i] = 0;
+
+		unsigned int bufferHandle = ocldevice1->allocateBuffer(&outH, sizeof(outH));
+		unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1", 1, bufferHandle);
+		unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, OCL_THREAD_TOTAL);
+
+		// Wait for OpenCL execution to complete
+		ocldevice1->wait(eventHandle);
+
+		// Read the result
+		ocldevice1->readBuffer(bufferHandle, &outH);
+
+		bool passed = 1;
+		std::cout << "Test complete:  ";
+		for(int i = 0; i < OCL_THREAD_TOTAL; i++)
+		{
+			if (i != outH[i])
+			{
+				passed = 0;
+				std::cout << "failed" << std::endl << std::endl;
+				break;
+			}
+		}
+		if(passed)
+			std::cout << "passed" << std::endl << std::endl;
 
         // set up dates
         Calendar calendar = TARGET();
@@ -124,45 +168,6 @@ int main(int, char* []) {
 
         // options
         VanillaOption europeanOption(payoff, europeanExercise);
-
-        //OpenCL test simulation
-		boost::shared_ptr<OclDevice> ocldevice1;
-		ocldevice1 = MakeOclDevice()
-			.withDeviceType(CL_DEVICE_TYPE_GPU);
-
-		//Load the kernels and compile them
-		std::ifstream file("kernels.cl");
-		std::string kernels(std::istreambuf_iterator<char>(file), (std::istreambuf_iterator<char>()));
-		file.close();
-
-		// Print the OpenCL source code to the terminal
-		//std::cout << kernels << std::endl;
-
-		cl::Program::Sources sources(1, std::make_pair(kernels.c_str(), kernels.length()+1));
-
-		size_t sourcesIndex = ocldevice1->loadSources(sources);
-
-    	size_t outH[OCL_THREAD_TOTAL];
-
-		unsigned int bufferHandle = ocldevice1->allocateBuffer(&outH, sizeof(outH));
-
-		unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1", 1, bufferHandle);
-
-		unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, OCL_THREAD_TOTAL);
-
-
-
-		//CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
-		//cl::CommandQueue queue(context, devices[0], 0, &err);
-		//cl::KernelFunctor func = kernel.bind(queue, cl::NDRange(4, 4), cl::NDRange(2, 2));
-
-		//func().wait();
-		//END CODE FOR CONTINUING TO LOAD AN OPENCL PROGRAM ONTO A DEVICE
-
-
-
-
-
 
 		// Analytic formulas:
 

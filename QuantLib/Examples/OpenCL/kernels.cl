@@ -28,9 +28,10 @@
 //}
 
 // Testing kernel
-__kernel void oclTest1(__global size_t* out)
+__kernel void oclTest1(__global unsigned long* out)
 {
-	size_t tid = get_global_id(0);
+	unsigned long tid = get_global_id(0);
+	//out[tid] = tid;
 	out[tid] = tid;
 }
 
