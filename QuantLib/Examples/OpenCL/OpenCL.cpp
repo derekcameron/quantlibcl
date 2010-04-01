@@ -36,7 +36,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <inttypes.h>
+#include <stdint.h>
 
 using namespace QuantLib;
 using std::ifstream;
