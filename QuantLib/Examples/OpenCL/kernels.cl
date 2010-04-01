@@ -17,21 +17,10 @@
  FOR A PARTICULAR PURPOSE.  See the license for more details.
 */
 
-#pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable
-
-// Hello World kernel
-//__constant char hw[] = "Hello World\n";
-//__kernel void helloWorld(__global char* out)
-//{
-//	size_t tid = get_global_id(0);
-//	out[tid] = hw[tid];
-//}
-
-// Testing kernel
+// Testing kernels
 __kernel void oclTest1(__global unsigned long* out)
 {
 	unsigned long tid = get_global_id(0);
-	//out[tid] = tid;
 	out[tid] = tid;
 }
 
