@@ -73,7 +73,7 @@ int main(int, char* []) {
 
 		size_t sourcesIndex = ocldevice1->loadSources(sources);
 
-    	uint64_t outH[OCL_THREAD_TOTAL];
+    	boost::uint64_t outH[OCL_THREAD_TOTAL];
     	for(int i = 0; i < OCL_THREAD_TOTAL; i++)
     		outH[i] = 0;
 
