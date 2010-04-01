@@ -33,10 +33,10 @@
 #endif
 
 #include <boost/timer.hpp>
+#include <boost/cstdint.hpp>
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <stdint.h>
 
 using namespace QuantLib;
 using std::ifstream;
