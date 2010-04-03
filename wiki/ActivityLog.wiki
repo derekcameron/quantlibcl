@@ -1,5 +1,14 @@
 #summary QuantLibCL development activity log.
 
+*2 April 2010*
+ * Initial Mersenne Twister development
+ * Initial Acklam Inverse CND function development
+
+*March 2010*
+ * Completed development of initial OpenCL framework
+ * Completed development of OpenCL test kernels
+ * Ongoing development of Monte Carlo framework
+
 *28 February 2010*
  * Uploaded initial OpenCL utility library 
  * Investigated and implemented the boost exception framework in OpenCL utility library
