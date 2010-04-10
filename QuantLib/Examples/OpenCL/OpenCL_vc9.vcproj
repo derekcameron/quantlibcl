@@ -819,6 +819,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\dcmt.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OpenCL.cpp"
 				>
 			</File>
@@ -827,16 +831,60 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\dcmt.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mersennetwister.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\mt_params.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NVIDIA_mersennetwister.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\typedefs.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath="ReadMe.txt"
+				>
+			</File>
 		</Filter>
-		<File
-			RelativePath="ReadMe.txt"
+		<Filter
+			Name="cl Source files"
 			>
-		</File>
+			<File
+				RelativePath=".\acklam.cl"
+				>
+			</File>
+			<File
+				RelativePath=".\kernels.cl"
+				>
+			</File>
+			<File
+				RelativePath=".\mersennetwister.cl"
+				>
+			</File>
+			<File
+				RelativePath=".\NVIDIA_mersennetwister.cl"
+				>
+			</File>
+			<File
+				RelativePath=".\thomaslukrng.cl"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
