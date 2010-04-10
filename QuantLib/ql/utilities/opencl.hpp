@@ -38,8 +38,6 @@
 #include <CL/cl.hpp>
 #endif
 
-#include <stdarg.h>
-
 
 namespace QuantLib {
 
@@ -55,12 +53,13 @@ namespace QuantLib {
 		);
 		//! Load and compile OpenCL sources on this device
 		unsigned int loadSources(const cl::Program::Sources &sources);
-		unsigned int loadKernel(const size_t programIndex, const char* kernelName, size_t argsNum, ...);
+		unsigned int loadKernel(const size_t programIndex, const char* kernelName);
 		unsigned int allocateBuffer(void* ptr, const size_t bufferSize);
-		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads);
+		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize = 128);
 		void wait(const unsigned int eventHandle);
 		void readBuffer(const unsigned int bufferHandle, void* dest);
 		cl::Buffer buffer(unsigned int i);
+		template <class T> void setKernelArg(unsigned int kernelHandle, cl_uint argIndex, T arg);
 	private:
 		cl::Context context_;
 		cl::vector<cl::Device> devices_;
@@ -92,18 +91,9 @@ namespace QuantLib {
 		return programs_.size() - 1;
 	}
 
-	inline unsigned int OclDevice::loadKernel(const size_t programIndex, const char* kernelName, size_t argsNum, ...) {
+	inline unsigned int OclDevice::loadKernel(const size_t programIndex, const char* kernelName) {
 		// Load the kernel
 		kernels_.push_back(cl::Kernel(programs_[programIndex], kernelName));
-
-		// Set arguments for the kernel
-		va_list ap;
-		va_start(ap, argsNum);
-		for(size_t i = 0; i < argsNum; i++) {
-			kernels_.back().setArg(i, va_arg(ap, unsigned int));
-		}
-		va_end(ap);
-
 		return kernels_.size() - 1;
 	}
 
@@ -113,13 +103,13 @@ namespace QuantLib {
 		return buffers_.size() - 1;
 	}
 
-	inline unsigned int OclDevice::launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads) {
+	inline unsigned int OclDevice::launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize) {
 		events_.push_back(cl::Event());
 		commandQueue_.enqueueNDRangeKernel(
 				kernels_[kernelHandle],
 				cl::NullRange,
 				cl::NDRange(numberOfThreads),
-				cl::NDRange(1, 1),
+				cl::NDRange(localWorkSize),
 				NULL,
 				&events_.back()
 			);
@@ -143,6 +133,10 @@ namespace QuantLib {
 
 	inline cl::Buffer OclDevice::buffer(unsigned int i) {
 		return buffers_[i];
+	}
+
+	template <class T> inline void OclDevice::setKernelArg(unsigned int kernelHandle, cl_uint argIndex, T arg) {
+		kernels_[kernelHandle].setArg(argIndex, arg);
 	}
 
 	class MakeOclDevice {
@@ -197,8 +191,6 @@ namespace QuantLib {
 		deviceType_ = deviceType;
 		return *this;
 	}
-
-
 }
 
 //End of 'ifdef QUANTLIB_DISABLE_OPENCL'

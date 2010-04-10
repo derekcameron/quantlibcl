@@ -71,7 +71,8 @@ void test1(boost::shared_ptr<OclDevice> ocldevice1) {
 
 	//Allocate buffers and launch threads on the device
 	unsigned int bufferHandle = ocldevice1->allocateBuffer(&outH, sizeof(outH));
-	unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1", 1, bufferHandle);
+	unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1");
+	ocldevice1->setKernelArg(kernelHandle, 0, ocldevice1->buffer(bufferHandle));
 	unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, OCL_THREAD_TOTAL);
 
 	// Wait for OpenCL execution to complete
@@ -194,10 +195,11 @@ void test4(boost::shared_ptr<OclDevice> ocldevice1) {
 	unsigned int d_RandGPU = ocldevice1->allocateBuffer(h_RandGPU.get(), size_h_RandGPU);
 	unsigned int d_mtParams = ocldevice1->allocateBuffer(h_mtParams.get(), size_h_mtParams);
 	
-	//Load and launch the kernel
-	//Our error is in the next line...the loadKernel command assumes the only arguments to kernels are buffers
-	//But in our case, we need to modify our code to support other argument types (like ints)
-	unsigned int kernelHandle = ocldevice1->loadKernel(sources4Index,"MersenneTwister", 1, ocldevice1->buffer(d_RandGPU), ocldevice1->buffer(d_mtParams), NVIDIA_RVs_PER_THREAD);
+	//Load the kernel, set arguments, and launch it
+	unsigned int kernelHandle = ocldevice1->loadKernel(sources4Index,"MersenneTwister");
+	ocldevice1->setKernelArg(kernelHandle, 0, ocldevice1->buffer(d_RandGPU));
+	ocldevice1->setKernelArg(kernelHandle, 1, ocldevice1->buffer(d_mtParams));
+	ocldevice1->setKernelArg(kernelHandle, 2, NVIDIA_RVs_PER_THREAD);
 	unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, NVIDIA_MT_RNG_COUNT);
 }
 
@@ -214,7 +216,7 @@ int main(int, char* []) {
 		// Run the tests
 		//test1(ocldevice1);
 		//test2(ocldevice1);
-		test3(ocldevice1);
+		//test3(ocldevice1);
 		test4(ocldevice1);
 
         // set up dates
