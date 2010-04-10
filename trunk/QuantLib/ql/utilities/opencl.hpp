@@ -60,6 +60,7 @@ namespace QuantLib {
 		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads);
 		void wait(const unsigned int eventHandle);
 		void readBuffer(const unsigned int bufferHandle, void* dest);
+		cl::Buffer buffer(unsigned int i);
 	private:
 		cl::Context context_;
 		cl::vector<cl::Device> devices_;
@@ -98,8 +99,8 @@ namespace QuantLib {
 		// Set arguments for the kernel
 		va_list ap;
 		va_start(ap, argsNum);
-		for(int i = 0; i < argsNum; i++) {
-			kernels_.back().setArg(i, buffers_[va_arg(ap, unsigned int)]);
+		for(size_t i = 0; i < argsNum; i++) {
+			kernels_.back().setArg(i, va_arg(ap, unsigned int));
 		}
 		va_end(ap);
 
@@ -126,11 +127,11 @@ namespace QuantLib {
 		return events_.size() - 1;
 	}
 
-	void OclDevice::wait(const unsigned int eventHandle) {
+	inline void OclDevice::wait(const unsigned int eventHandle) {
 		events_[eventHandle].wait();
 	}
 
-	void OclDevice::readBuffer(const unsigned int bufferHandle, void* dest) {
+	inline void OclDevice::readBuffer(const unsigned int bufferHandle, void* dest) {
 		commandQueue_.enqueueReadBuffer(
 				buffers_[bufferHandle],
 				CL_TRUE,
@@ -138,6 +139,10 @@ namespace QuantLib {
 				bufferSizes_[bufferHandle],
 				dest
 				);
+	}
+
+	inline cl::Buffer OclDevice::buffer(unsigned int i) {
+		return buffers_[i];
 	}
 
 	class MakeOclDevice {

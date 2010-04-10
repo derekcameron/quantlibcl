@@ -18,15 +18,32 @@
 */
 
 // Testing kernels
-__kernel void oclTest1(__global unsigned long* out)
-{
+__kernel void oclTest1(__global unsigned long* out) {
 	unsigned long tid = get_global_id(0);
 	out[tid] = tid;
 }
 
+// Pseudocode for a samples generator
+// adapted from MonteCarloModel<MC,RNG,S>::addSamples(Size samples)
+// in QuantLib : montecarlomodel.hpp
+
+void generateSamples(ulong samples, float* ptr) {
+	for(ulong i = 0; i < samples; i++) {
+		
+		// Generate one path
+		float path = pathGenerator();
+		
+		// Calculate a value based on that path
+		float price = calculateAssetValue(path);
+		
+		
+	}
+}
+
 // Pseudocode for 1-factor MonteCarlo simulation code, assuming no control-variation path pricer
-// adopted from Quantlib : mcsimulation.hpp
-//__kernel mc_calculate(const double requiredTolerance) {
+// adapted from Quantlib : mcsimulation.hpp
+
+__kernel void MC_Calculate(const float requiredTolerance) {
 //	double order, errorEstimate;
 //	unsigned __int64 sambleNumber, nextBatch, minSamples = 1023, maxSamples = 2147483647;
 
@@ -46,4 +63,4 @@ __kernel void oclTest1(__global unsigned long* out)
 //	}
 
 //	return averageOfSamples();
-//}
+}
