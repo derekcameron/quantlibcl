@@ -61,7 +61,7 @@ namespace QuantLib {
 		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize = 128);
 		void wait(const unsigned int eventHandle);
 		void readBuffer(const unsigned int bufferHandle, void* dest);
-		cl::Buffer buffer(unsigned int i);
+		boost::shared_ptr<cl::Buffer> buffer(unsigned int i);
 		template <class T> void setKernelArg(unsigned int kernelHandle, cl_uint argIndex, T arg);
 	private:
 		cl::Context context_;
@@ -69,7 +69,7 @@ namespace QuantLib {
 		cl::Device device_;
 		cl::CommandQueue commandQueue_;
 		cl::vector<cl::Program> programs_;
-		cl::vector<cl::Buffer> buffers_;
+		cl::vector<boost::shared_ptr<cl::Buffer> > buffers_;
 		cl::vector<size_t> bufferSizes_;
 		cl::vector<cl::Kernel> kernels_;
 		cl::vector<boost::shared_ptr<cl::Event> > events_;
@@ -109,7 +109,7 @@ namespace QuantLib {
 	}
 
 	inline unsigned int OclDevice::allocateBuffer(void* ptr, const size_t bufferSize) {
-		buffers_.push_back(cl::Buffer(context_, CL_MEM_USE_HOST_PTR, bufferSize, ptr));
+		buffers_.push_back(boost::shared_ptr<cl::Buffer>(new cl::Buffer(context_, CL_MEM_USE_HOST_PTR, bufferSize, ptr)));
 		bufferSizes_.push_back(bufferSize);
 		return buffers_.size() - 1;
 	}
@@ -138,7 +138,7 @@ namespace QuantLib {
 
 	inline void OclDevice::readBuffer(const unsigned int bufferHandle, void* dest) {
 		commandQueue_.enqueueReadBuffer(
-				buffers_[bufferHandle],
+				*(buffers_[bufferHandle].get()),
 				CL_TRUE,
 				0,
 				bufferSizes_[bufferHandle],
@@ -146,7 +146,7 @@ namespace QuantLib {
 				);
 	}
 
-	inline cl::Buffer OclDevice::buffer(unsigned int i) {
+	inline boost::shared_ptr<cl::Buffer> OclDevice::buffer(unsigned int i) {
 		return buffers_[i];
 	}
 
