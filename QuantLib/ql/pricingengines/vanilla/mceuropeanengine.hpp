@@ -39,16 +39,16 @@ namespace QuantLib {
         \test the correctness of the returned value is tested by
               checking it against analytic results.
     */
-    template <class RNG = PseudoRandom, class S = Statistics>
-    class MCEuropeanEngine : public MCVanillaEngine<SingleVariate,RNG,S> {
+    template <class RNG = PseudoRandom, class S = Statistics, template <template <class> class,class,class> class SIM = McSimulation>
+    class MCEuropeanEngine : public MCVanillaEngine<SingleVariate,RNG,S,VanillaOption,SIM> {
       public:
         typedef
-        typename MCVanillaEngine<SingleVariate,RNG,S>::path_generator_type
+        typename MCVanillaEngine<SingleVariate,RNG,S,VanillaOption,SIM>::path_generator_type
             path_generator_type;
         typedef
-        typename MCVanillaEngine<SingleVariate,RNG,S>::path_pricer_type
+        typename MCVanillaEngine<SingleVariate,RNG,S,VanillaOption,SIM>::path_pricer_type
             path_pricer_type;
-        typedef typename MCVanillaEngine<SingleVariate,RNG,S>::stats_type
+        typedef typename MCVanillaEngine<SingleVariate,RNG,S,VanillaOption,SIM>::stats_type
             stats_type;
         // constructor
         MCEuropeanEngine(
@@ -66,7 +66,7 @@ namespace QuantLib {
     };
 
     //! Monte Carlo European engine factory
-    template <class RNG = PseudoRandom, class S = Statistics>
+    template <class RNG = PseudoRandom, class S = Statistics, template <template <class> class,class,class> class SIM = McSimulation>
     class MakeMCEuropeanEngine {
       public:
         MakeMCEuropeanEngine(
@@ -105,9 +105,9 @@ namespace QuantLib {
 
     // inline definitions
 
-    template <class RNG, class S>
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
     inline
-    MCEuropeanEngine<RNG,S>::MCEuropeanEngine(
+    MCEuropeanEngine<RNG,S,SIM>::MCEuropeanEngine(
              const boost::shared_ptr<GeneralizedBlackScholesProcess>& process,
              Size timeSteps,
              Size timeStepsPerYear,
@@ -117,7 +117,7 @@ namespace QuantLib {
              Real requiredTolerance,
              Size maxSamples,
              BigNatural seed)
-    : MCVanillaEngine<SingleVariate,RNG,S>(process,
+    : MCVanillaEngine<SingleVariate,RNG,S,VanillaOption,SIM>(process,
                                            timeSteps,
                                            timeStepsPerYear,
                                            brownianBridge,
@@ -129,10 +129,10 @@ namespace QuantLib {
                                            seed) {}
 
 
-    template <class RNG, class S>
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
     inline
-    boost::shared_ptr<typename MCEuropeanEngine<RNG,S>::path_pricer_type>
-    MCEuropeanEngine<RNG,S>::pathPricer() const {
+    boost::shared_ptr<typename MCEuropeanEngine<RNG,S,SIM>::path_pricer_type>
+    MCEuropeanEngine<RNG,S,SIM>::pathPricer() const {
 
         boost::shared_ptr<PlainVanillaPayoff> payoff =
             boost::dynamic_pointer_cast<PlainVanillaPayoff>(
@@ -145,7 +145,7 @@ namespace QuantLib {
         QL_REQUIRE(process, "Black-Scholes process required");
 
         return boost::shared_ptr<
-                       typename MCEuropeanEngine<RNG,S>::path_pricer_type>(
+                       typename MCEuropeanEngine<RNG,S,SIM>::path_pricer_type>(
           new EuropeanPathPricer(
               payoff->optionType(),
               payoff->strike(),
@@ -153,40 +153,40 @@ namespace QuantLib {
     }
 
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>::MakeMCEuropeanEngine(
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>::MakeMCEuropeanEngine(
              const boost::shared_ptr<GeneralizedBlackScholesProcess>& process)
     : process_(process), antithetic_(false),
       steps_(Null<Size>()), stepsPerYear_(Null<Size>()),
       samples_(Null<Size>()), maxSamples_(Null<Size>()),
       tolerance_(Null<Real>()), brownianBridge_(false), seed_(0) {}
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withSteps(Size steps) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withSteps(Size steps) {
         steps_ = steps;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withStepsPerYear(Size steps) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withStepsPerYear(Size steps) {
         stepsPerYear_ = steps;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withSamples(Size samples) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withSamples(Size samples) {
         QL_REQUIRE(tolerance_ == Null<Real>(),
                    "tolerance already set");
         samples_ = samples;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withAbsoluteTolerance(Real tolerance) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withAbsoluteTolerance(Real tolerance) {
         QL_REQUIRE(samples_ == Null<Size>(),
                    "number of samples already set");
         QL_REQUIRE(RNG::allowsErrorEstimate,
@@ -196,44 +196,44 @@ namespace QuantLib {
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withMaxSamples(Size samples) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withMaxSamples(Size samples) {
         maxSamples_ = samples;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withSeed(BigNatural seed) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withSeed(BigNatural seed) {
         seed_ = seed;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withBrownianBridge(bool brownianBridge) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withBrownianBridge(bool brownianBridge) {
         brownianBridge_ = brownianBridge;
         return *this;
     }
 
-    template <class RNG, class S>
-    inline MakeMCEuropeanEngine<RNG,S>&
-    MakeMCEuropeanEngine<RNG,S>::withAntitheticVariate(bool b) {
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
+    inline MakeMCEuropeanEngine<RNG,S,SIM>&
+    MakeMCEuropeanEngine<RNG,S,SIM>::withAntitheticVariate(bool b) {
         antithetic_ = b;
         return *this;
     }
 
-    template <class RNG, class S>
+    template <class RNG, class S, template <template <class> class,class,class> class SIM>
     inline
-    MakeMCEuropeanEngine<RNG,S>::operator boost::shared_ptr<PricingEngine>()
+    MakeMCEuropeanEngine<RNG,S,SIM>::operator boost::shared_ptr<PricingEngine>()
                                                                       const {
         QL_REQUIRE(steps_ != Null<Size>() || stepsPerYear_ != Null<Size>(),
                    "number of steps not given");
         QL_REQUIRE(steps_ == Null<Size>() || stepsPerYear_ == Null<Size>(),
                    "number of steps overspecified");
         return boost::shared_ptr<PricingEngine>(new
-            MCEuropeanEngine<RNG,S>(process_,
+            MCEuropeanEngine<RNG,S,SIM>(process_,
                                     steps_,
                                     stepsPerYear_,
                                     brownianBridge_,

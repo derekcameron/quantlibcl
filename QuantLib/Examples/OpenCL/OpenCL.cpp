@@ -288,7 +288,7 @@ int main(int, char* []) {
 		//test2(ocldevice1);
 		//test3(ocldevice1);
 		//test4(ocldevice1);
-		test5(ocldevice1);
+		//test5(ocldevice1);
 
         // set up dates
         Calendar calendar = TARGET();
@@ -384,7 +384,7 @@ int main(int, char* []) {
         method = "OpenCL MC (crude)";
         Size mcSeed2 = 42;
 		boost::shared_ptr<PricingEngine> mcengine2;
-		mcengine2 = MakeMCEuropeanEngineOCL<PseudoRandom>(bsmProcess)
+		mcengine2 = MakeMCEuropeanEngine<PseudoRandom,Statistics,McSimulationCl>(bsmProcess)
             .withSteps(timeSteps)
             .withAbsoluteTolerance(0.1)
             .withSeed(mcSeed2);

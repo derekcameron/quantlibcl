@@ -4824,6 +4824,10 @@
 				RelativePath="ql\pricingengines\mcsimulation.hpp"
 				>
 			</File>
+			<File
+				RelativePath=".\ql\pricingengines\mcsimulationcl.hpp"
+				>
+			</File>
 			<Filter
 				Name="asian"
 				>
