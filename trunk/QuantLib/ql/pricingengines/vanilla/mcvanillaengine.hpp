@@ -3,6 +3,7 @@
 /*
  Copyright (C) 2003 Ferdinando Ametrano
  Copyright (C) 2003, 2004, 2005, 2007 StatPro Italia srl
+ Copyright (C) 2010 William Gross
 
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
@@ -33,9 +34,9 @@ namespace QuantLib {
     //! Pricing engine for vanilla options using Monte Carlo simulation
     /*! \ingroup vanillaengines */
     template <template <class> class MC, class RNG,
-              class S = Statistics, class Inst = VanillaOption>
+              class S = Statistics, class Inst = VanillaOption, template <template <class> class,class,class> class SIM = McSimulation>
     class MCVanillaEngine : public Inst::engine,
-                            public McSimulation<MC,RNG,S> {
+                            public SIM<MC,RNG,S> {
       public:
         void calculate() const {
             McSimulation<MC,RNG,S>::calculate(requiredTolerance_,
@@ -91,8 +92,8 @@ namespace QuantLib {
 
     // template definitions
 
-    template <template <class> class MC, class RNG, class S, class Inst>
-    inline MCVanillaEngine<MC,RNG,S,Inst>::MCVanillaEngine(
+    template <template <class> class MC, class RNG, class S, class Inst, template <template <class> class,class,class> class SIM>
+    inline MCVanillaEngine<MC,RNG,S,Inst,SIM>::MCVanillaEngine(
                           const boost::shared_ptr<StochasticProcess>& process,
                           Size timeSteps,
                           Size timeStepsPerYear,
@@ -124,9 +125,9 @@ namespace QuantLib {
         this->registerWith(process_);
     }
 
-    template <template <class> class MC, class RNG, class S, class Inst>
-    inline typename MCVanillaEngine<MC,RNG,S,Inst>::result_type
-    MCVanillaEngine<MC,RNG,S,Inst>::controlVariateValue() const {
+    template <template <class> class MC, class RNG, class S, class Inst, template <template <class> class,class,class> class SIM>
+    inline typename MCVanillaEngine<MC,RNG,S,Inst,SIM>::result_type
+    MCVanillaEngine<MC,RNG,S,Inst,SIM>::controlVariateValue() const {
 
         boost::shared_ptr<PricingEngine> controlPE =
             this->controlPricingEngine();
@@ -153,8 +154,8 @@ namespace QuantLib {
     }
 
 
-    template <template <class> class MC, class RNG, class S, class Inst>
-    inline TimeGrid MCVanillaEngine<MC,RNG,S,Inst>::timeGrid() const {
+    template <template <class> class MC, class RNG, class S, class Inst, template <template <class> class,class,class> class SIM>
+    inline TimeGrid MCVanillaEngine<MC,RNG,S,Inst,SIM>::timeGrid() const {
         Date lastExerciseDate = this->arguments_.exercise->lastDate();
         Time t = process_->time(lastExerciseDate);
         if (this->timeSteps_ != Null<Size>()) {
