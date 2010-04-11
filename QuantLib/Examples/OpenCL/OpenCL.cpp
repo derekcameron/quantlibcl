@@ -177,30 +177,41 @@ void test4(boost::shared_ptr<OclDevice> ocldevice1) {
 
 	test4LoadParameters("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
 
-	for (int i = 0; i < NVIDIA_MT_RNG_COUNT; i++) {
-		std::cout << "Item " << i << std::endl;
-		std::cout << "aaa = " << h_mtParams[i].matrix_a << std::endl;
-		std::cout << "maskB = " << h_mtParams[i].mask_b << std::endl;
-		std::cout << "maskC = " << h_mtParams[i].mask_c << std::endl;
-		std::cout << "seed = " << h_mtParams[i].seed << std::endl << std::endl;
-	}
-
 	std::ifstream file4("NVIDIA_mersennetwister.cl");
 	std::string string4(std::istreambuf_iterator<char>(file4), (std::istreambuf_iterator<char>()));
 	file4.close();
 	cl::Program::Sources sources4(1, std::make_pair(string4.c_str(), string4.length()+1));
-	size_t sources4Index = ocldevice1->loadSources(sources4);
+	unsigned int programHandle = ocldevice1->loadSources(sources4);
 
 	//Allocate device buffers
 	unsigned int d_RandGPU = ocldevice1->allocateBuffer(h_RandGPU.get(), size_h_RandGPU);
 	unsigned int d_mtParams = ocldevice1->allocateBuffer(h_mtParams.get(), size_h_mtParams);
 	
 	//Load the kernel, set arguments, and launch it
-	unsigned int kernelHandle = ocldevice1->loadKernel(sources4Index,"MersenneTwister");
+	unsigned int kernelHandle = ocldevice1->loadKernel(programHandle,"MersenneTwister");
 	ocldevice1->setKernelArg(kernelHandle, 0, ocldevice1->buffer(d_RandGPU));
 	ocldevice1->setKernelArg(kernelHandle, 1, ocldevice1->buffer(d_mtParams));
 	ocldevice1->setKernelArg(kernelHandle, 2, NVIDIA_RVs_PER_THREAD);
 	unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, NVIDIA_MT_RNG_COUNT);
+
+	// Wait for OpenCL execution to complete
+	ocldevice1->wait(eventHandle);
+
+	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
+	ocldevice1->readBuffer(d_RandGPU, h_RandGPU.get());
+
+	//Calculate the average and print it to the screen
+	float sum = 0.0;
+	for(uint32_t i = 0; i < NVIDIA_nRand; i++)
+		sum += h_RandGPU[i];
+
+	float avg = sum / NVIDIA_nRand;
+
+	std::cout << "Test 4 average = " << avg << std::endl;
+
+	//All allocated OpenCL objects should be released automatically here
+	//But for some reason one of our buffer objects is causing an exception at program termination
+	//WTF?!?!?
 }
 
 int main(int, char* []) {

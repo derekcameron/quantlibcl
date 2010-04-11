@@ -53,8 +53,11 @@ namespace QuantLib {
 		);
 		//! Load and compile OpenCL sources on this device
 		unsigned int loadSources(const cl::Program::Sources &sources);
+		void releaseProgram(unsigned int programHandle);
 		unsigned int loadKernel(const size_t programIndex, const char* kernelName);
+		void releaseKernel(unsigned int kernelHandle);
 		unsigned int allocateBuffer(void* ptr, const size_t bufferSize);
+		void releaseBuffer(unsigned int bufferHandle);
 		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize = 128);
 		void wait(const unsigned int eventHandle);
 		void readBuffer(const unsigned int bufferHandle, void* dest);
@@ -69,7 +72,7 @@ namespace QuantLib {
 		cl::vector<cl::Buffer> buffers_;
 		cl::vector<size_t> bufferSizes_;
 		cl::vector<cl::Kernel> kernels_;
-		cl::vector<cl::Event> events_;
+		cl::vector<boost::shared_ptr<cl::Event> > events_;
 	};
 
 	// constructor
@@ -91,10 +94,18 @@ namespace QuantLib {
 		return programs_.size() - 1;
 	}
 
+	inline void OclDevice::releaseProgram(unsigned int programHandle) {
+		//programs_[programHandle].release();
+	}
+
 	inline unsigned int OclDevice::loadKernel(const size_t programIndex, const char* kernelName) {
 		// Load the kernel
 		kernels_.push_back(cl::Kernel(programs_[programIndex], kernelName));
 		return kernels_.size() - 1;
+	}
+
+	inline void OclDevice::releaseKernel(unsigned int kernelHandle) {
+		//kernels_[kernelHandle].release();
 	}
 
 	inline unsigned int OclDevice::allocateBuffer(void* ptr, const size_t bufferSize) {
@@ -103,22 +114,26 @@ namespace QuantLib {
 		return buffers_.size() - 1;
 	}
 
+	inline void OclDevice::releaseBuffer(unsigned int bufferHandle) {
+		//buffers_[bufferHandle].release();
+	}
+
 	inline unsigned int OclDevice::launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize) {
-		events_.push_back(cl::Event());
+		events_.push_back(boost::shared_ptr<cl::Event>(new cl::Event()));
 		commandQueue_.enqueueNDRangeKernel(
 				kernels_[kernelHandle],
 				cl::NullRange,
 				cl::NDRange(numberOfThreads),
 				cl::NDRange(localWorkSize),
 				NULL,
-				&events_.back()
+				events_.back().get()
 			);
 
 		return events_.size() - 1;
 	}
 
 	inline void OclDevice::wait(const unsigned int eventHandle) {
-		events_[eventHandle].wait();
+		events_[eventHandle]->wait();
 	}
 
 	inline void OclDevice::readBuffer(const unsigned int bufferHandle, void* dest) {
