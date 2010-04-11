@@ -151,7 +151,7 @@ void test4LoadParameters(const char *fname,
             {
                 fclose (fd);
             }
-			throw std::exception("Error opening mt_params raw data file in test 4");
+			throw std::runtime_error("Error opening mt_params raw data file in test 4");
         }
   
     for (unsigned int i = 0; i < size; i++)

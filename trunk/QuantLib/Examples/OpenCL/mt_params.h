@@ -4,11 +4,11 @@
 //Period parameters
 #define MT_NN 624
 #define MT_MM 397
-#define MATRIX_A UINT32_C(0x9908b0df)   /* constant vector a */
-#define MT_UMASK UINT32_C(0x80000000) /* most significant w-r bits */
-#define MT_LMASK UINT32_C(0x7fffffff) /* least significant r bits */
-#define TEMPERING_MASK_B UINT32_C(0x9d2c5680)
-#define TEMPERING_MASK_C UINT32_C(0xefc60000)
+#define MATRIX_A 0x9908b0dfUL   /* constant vector a */
+#define MT_UMASK 0x80000000UL /* most significant w-r bits */
+#define MT_LMASK 0x7fffffffUL /* least significant r bits */
+#define TEMPERING_MASK_B 0x9d2c5680UL
+#define TEMPERING_MASK_C 0xefc60000UL
 #define TEMPERING_SHIFT_U(x)  (x >> 11)
 #define TEMPERING_SHIFT_S(x)  (x << 7)
 #define TEMPERING_SHIFT_T(x)  (x << 15)

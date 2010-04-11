@@ -17,6 +17,7 @@
 #include "dcmt.hpp"
 #include <stdlib.h>
 #include <stdio.h>
+#include <cstring> //required for memcmp()
 #include <boost/cstdint.hpp>
 
 static const int irredpolylist[NIRREDPOLY][MAX_IRRED_DEG+1] = {
@@ -429,7 +430,7 @@ void _sgenrand_dc(_org_state *st, uint32_t seed) {
 
     for (i=0;i<MT_NN;i++) {
 		st->mt[i] = seed;
-        seed = (UINT32_C(1812433253) * (seed  ^ (seed >> 30))) + i + 1;
+        seed = (1812433253UL * (seed  ^ (seed >> 30))) + i + 1;
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         /* In the previous versions, MSBs of the seed affect   */
         /* only MSBs of the array mt[].                        */
@@ -658,7 +659,7 @@ static void init_tempering(eqdeg_t *eq, mt_params *mtp)
 
 
     for( i=0; i<WORDLENGTH; i++)
-        eq->bitmask[i] = UINT32_C(0x80000000) >> i;
+        eq->bitmask[i] = 0x80000000UL >> i;
 
     for( i=0, eq->glower_mask=0; i<eq->rrr; i++)
 	eq->glower_mask = (eq->glower_mask<<1)| 0x1;
