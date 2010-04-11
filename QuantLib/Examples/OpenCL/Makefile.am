@@ -7,12 +7,17 @@ TESTS = OpenCL$(EXEEXT)
 else
 noinst_PROGRAMS = OpenCL
 endif
-OpenCL_SOURCES = OpenCL.cpp
+OpenCL_SOURCES = OpenCL.cpp dcmt.cpp 
 OpenCL_LDADD = ../../ql/libQuantLib.la
 OpenCL_LDFLAGS = -lpthread
 
 EXTRA_DIST = \
+	acklam.cl \
 	kernels.cl \
+	mersennetwister.cl \
+	NVIDIA_mersennetwister.cl \
+	simple.cl \
+	thomaslukrng.cl \
     OpenCL.dev \
     OpenCL_vc9.vcproj \
     ReadMe.txt
