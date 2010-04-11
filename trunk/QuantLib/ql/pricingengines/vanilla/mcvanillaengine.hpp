@@ -39,7 +39,7 @@ namespace QuantLib {
                             public SIM<MC,RNG,S> {
       public:
         void calculate() const {
-            McSimulation<MC,RNG,S>::calculate(requiredTolerance_,
+            SIM<MC,RNG,S>::calculate(requiredTolerance_,
                                               requiredSamples_,
                                               maxSamples_);
             this->results_.value = this->mcModel_->sampleAccumulator().mean();
@@ -48,13 +48,13 @@ namespace QuantLib {
                 this->mcModel_->sampleAccumulator().errorEstimate();
         }
       protected:
-        typedef typename McSimulation<MC,RNG,S>::path_generator_type
+        typedef typename SIM<MC,RNG,S>::path_generator_type
             path_generator_type;
-        typedef typename McSimulation<MC,RNG,S>::path_pricer_type
+        typedef typename SIM<MC,RNG,S>::path_pricer_type
             path_pricer_type;
-        typedef typename McSimulation<MC,RNG,S>::stats_type
+        typedef typename SIM<MC,RNG,S>::stats_type
             stats_type;
-        typedef typename McSimulation<MC,RNG,S>::result_type
+        typedef typename SIM<MC,RNG,S>::result_type
             result_type;
         // constructor
         MCVanillaEngine(const boost::shared_ptr<StochasticProcess>&,
@@ -104,7 +104,7 @@ namespace QuantLib {
                           Real requiredTolerance,
                           Size maxSamples,
                           BigNatural seed)
-    : McSimulation<MC,RNG,S>(antitheticVariate, controlVariate),
+    : SIM<MC,RNG,S>(antitheticVariate, controlVariate),
       process_(process), timeSteps_(timeSteps),
       timeStepsPerYear_(timeStepsPerYear),
       requiredSamples_(requiredSamples), maxSamples_(maxSamples),
