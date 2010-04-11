@@ -72,7 +72,7 @@ void test1(boost::shared_ptr<OclDevice> ocldevice1) {
 	//Allocate buffers and launch threads on the device
 	unsigned int bufferHandle = ocldevice1->allocateBuffer(&outH, sizeof(outH));
 	unsigned int kernelHandle = ocldevice1->loadKernel(sourcesIndex,"oclTest1");
-	ocldevice1->setKernelArg(kernelHandle, 0, ocldevice1->buffer(bufferHandle));
+	ocldevice1->setKernelArg(kernelHandle, 0, *(ocldevice1->buffer(bufferHandle)));
 	unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, OCL_THREAD_TOTAL);
 
 	// Wait for OpenCL execution to complete
@@ -189,8 +189,8 @@ void test4(boost::shared_ptr<OclDevice> ocldevice1) {
 	
 	//Load the kernel, set arguments, and launch it
 	unsigned int kernelHandle = ocldevice1->loadKernel(programHandle,"MersenneTwister");
-	ocldevice1->setKernelArg(kernelHandle, 0, ocldevice1->buffer(d_RandGPU));
-	ocldevice1->setKernelArg(kernelHandle, 1, ocldevice1->buffer(d_mtParams));
+	ocldevice1->setKernelArg(kernelHandle, 0, *(ocldevice1->buffer(d_RandGPU)));
+	ocldevice1->setKernelArg(kernelHandle, 1, *(ocldevice1->buffer(d_mtParams)));
 	ocldevice1->setKernelArg(kernelHandle, 2, NVIDIA_RVs_PER_THREAD);
 	unsigned int eventHandle = ocldevice1->launchKernel(kernelHandle, NVIDIA_MT_RNG_COUNT);
 
@@ -214,6 +214,65 @@ void test4(boost::shared_ptr<OclDevice> ocldevice1) {
 	//WTF?!?!?
 }
 
+// Test 5 - Generate normally distributed random variables using the GPL'd NVIDIA Mersenne Twister algorithm
+// and a Box Muller transform
+void test5(boost::shared_ptr<OclDevice> ocldevice) {
+	
+	//const parameters
+	const int seed = 777;
+
+	// Allocate space for the result
+	boost::shared_array<float> h_RandGPU(new float[NVIDIA_nRand]);
+	const size_t size_h_RandGPU = sizeof(float[NVIDIA_nRand]);
+	// Allocate space for dynamic creation parameters
+	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
+	const size_t size_h_mtParams = sizeof(mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
+
+	test4LoadParameters("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
+
+	std::ifstream kernel_file("NVIDIA_mersennetwister.cl");
+	std::string kernel_string(std::istreambuf_iterator<char>(kernel_file), (std::istreambuf_iterator<char>()));
+	kernel_file.close();
+	cl::Program::Sources sources(1, std::make_pair(kernel_string.c_str(), kernel_string.length()+1));
+	unsigned int programHandle = ocldevice->loadSources(sources);
+
+	//Allocate device buffers
+	unsigned int d_RandGPU = ocldevice->allocateBuffer(h_RandGPU.get(), size_h_RandGPU);
+	unsigned int d_mtParams = ocldevice->allocateBuffer(h_mtParams.get(), size_h_mtParams);
+	
+	//Load the Mersenne Twister kernel, set arguments, and launch it
+	unsigned int mersenneTwisterKernelHandle = ocldevice->loadKernel(programHandle,"MersenneTwister");
+	ocldevice->setKernelArg(mersenneTwisterKernelHandle, 0, *(ocldevice->buffer(d_RandGPU)));
+	ocldevice->setKernelArg(mersenneTwisterKernelHandle, 1, *(ocldevice->buffer(d_mtParams)));
+	ocldevice->setKernelArg(mersenneTwisterKernelHandle, 2, NVIDIA_RVs_PER_THREAD);
+	unsigned int mersenneTwisterKernelEventHandle = ocldevice->launchKernel(mersenneTwisterKernelHandle, NVIDIA_MT_RNG_COUNT);
+
+	//Load the Box Muller kernel, set arguments, and launch it
+	unsigned int boxMullerKernelHandle = ocldevice->loadKernel(programHandle,"BoxMuller");
+	ocldevice->setKernelArg(boxMullerKernelHandle, 0, *(ocldevice->buffer(d_RandGPU)));
+	ocldevice->setKernelArg(boxMullerKernelHandle, 1, NVIDIA_RVs_PER_THREAD);
+	unsigned int boxMullerKernelEventHandle = ocldevice->launchKernel(boxMullerKernelHandle, NVIDIA_MT_RNG_COUNT);
+
+	// Wait for OpenCL execution to complete
+	ocldevice->wait(boxMullerKernelEventHandle );
+
+	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
+	ocldevice->readBuffer(d_RandGPU, h_RandGPU.get());
+
+	//Calculate the average and print it to the screen
+	float sum = 0.0;
+	for(uint32_t i = 0; i < NVIDIA_nRand; i++)
+		sum += h_RandGPU[i];
+
+	float avg = sum / NVIDIA_nRand;
+
+	std::cout << "Test 5 average = " << avg << std::endl;
+
+	//All allocated OpenCL objects should be released automatically here
+	//But for some reason one of our buffer objects is causing an exception at program termination
+	//WTF?!?!?
+}
+
 int main(int, char* []) {
 
     try {
@@ -228,7 +287,8 @@ int main(int, char* []) {
 		//test1(ocldevice1);
 		//test2(ocldevice1);
 		//test3(ocldevice1);
-		test4(ocldevice1);
+		//test4(ocldevice1);
+		test5(ocldevice1);
 
         // set up dates
         Calendar calendar = TARGET();
