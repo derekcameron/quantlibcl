@@ -16,7 +16,8 @@ this_include_HEADERS = \
     greeks.hpp \
     latticeshortratemodelengine.hpp \
     mclongstaffschwartzengine.hpp \
-    mcsimulation.hpp
+    mcsimulation.hpp \
+    mcsimulationcl.hpp
 
 libPricingEngines_la_SOURCES = \
 	americanpayoffatexpiry.cpp \

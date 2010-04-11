@@ -11,6 +11,7 @@
 #include <ql/pricingengines/latticeshortratemodelengine.hpp>
 #include <ql/pricingengines/mclongstaffschwartzengine.hpp>
 #include <ql/pricingengines/mcsimulation.hpp>
+#include <ql/pricingengines/mcsimulationcl.hpp>
 
 #include <ql/pricingengines/asian/all.hpp>
 #include <ql/pricingengines/barrier/all.hpp>
