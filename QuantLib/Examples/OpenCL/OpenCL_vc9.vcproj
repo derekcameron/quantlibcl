@@ -836,6 +836,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mcsimulation.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\mersennetwister.hpp"
 				>
 			</File>
@@ -870,6 +874,10 @@
 			</File>
 			<File
 				RelativePath=".\kernels.cl"
+				>
+			</File>
+			<File
+				RelativePath=".\mcsimulation.cl"
 				>
 			</File>
 			<File
