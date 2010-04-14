@@ -44,7 +44,7 @@ void generateSamples(ulong samples, float* ptr) {
 // adapted from Quantlib : mcsimulation.hpp
 
 __kernel void MC_Calculate(const float requiredTolerance) {
-//	double order, errorEstimate;
+	float order, errorEstimate;
 //	unsigned __int64 sambleNumber, nextBatch, minSamples = 1023, maxSamples = 2147483647;
 
 //	sampleNumber = getCurrentSampleNumber();

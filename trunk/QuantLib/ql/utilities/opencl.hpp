@@ -90,7 +90,13 @@ namespace QuantLib {
 
 	inline unsigned int OclDevice::loadSources(const cl::Program::Sources &sources) {
 		programs_.push_back(cl::Program(context_, sources));
-		programs_.back().build(devices_,"");
+		try {
+			programs_.back().build(devices_,"");
+		} catch (cl::Error& e) {
+			cl::string err;
+			programs_.back().getBuildInfo<cl::string>(device_, CL_PROGRAM_BUILD_LOG, &err);
+			throw std::runtime_error(std::string("FATAL ERROR: ") + e.what() + "\n\n" + err.c_str());
+		}
 		return programs_.size() - 1;
 	}
 

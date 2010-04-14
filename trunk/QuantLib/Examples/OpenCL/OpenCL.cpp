@@ -35,6 +35,7 @@
 #include "dcmt.hpp"
 #include "mersennetwister.hpp"
 #include "NVIDIA_mersennetwister.hpp"
+#include "mcsimulation.hpp"
 #include <boost/timer.hpp>
 #include <boost/cstdint.hpp>
 #include <fstream>
@@ -132,7 +133,7 @@ void test3(boost::shared_ptr<OclDevice> ocldevice1) {
 	size_t sources3Index = ocldevice1->loadSources(sources3);
 }
 
-void test4LoadParameters(const char *fname, 
+void loadMersenneTwisterParams(const char *fname, 
 	       const unsigned int seed, 
 	       mt_params_stripped *mtpp,
 	       const size_t size)
@@ -175,7 +176,7 @@ void test4(boost::shared_ptr<OclDevice> ocldevice1) {
 	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
 	const size_t size_h_mtParams = sizeof(mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
 
-	test4LoadParameters("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
+	loadMersenneTwisterParams("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
 
 	std::ifstream file4("NVIDIA_mersennetwister.cl");
 	std::string string4(std::istreambuf_iterator<char>(file4), (std::istreambuf_iterator<char>()));
@@ -228,7 +229,7 @@ void test5(boost::shared_ptr<OclDevice> ocldevice) {
 	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
 	const size_t size_h_mtParams = sizeof(mt_params_stripped[NVIDIA_MT_RNG_COUNT]);
 
-	test4LoadParameters("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
+	loadMersenneTwisterParams("data/MersenneTwister.dat", seed, h_mtParams.get(), NVIDIA_MT_RNG_COUNT);
 
 	std::ifstream kernel_file("NVIDIA_mersennetwister.cl");
 	std::string kernel_string(std::istreambuf_iterator<char>(kernel_file), (std::istreambuf_iterator<char>()));
@@ -273,6 +274,59 @@ void test5(boost::shared_ptr<OclDevice> ocldevice) {
 	//WTF?!?!?
 }
 
+// Test 6 - Generate normally distributed random variables using the GPL'd NVIDIA Mersenne Twister algorithm
+// and a Box Muller transform
+void test6(boost::shared_ptr<OclDevice> ocldevice) {
+	
+	//const parameters
+	const int seed = 777;
+	const uint32_t numberOfOptions = 128;
+	const uint32_t numberOfThreads = numberOfOptions;
+
+	// Allocate space for the result
+	boost::shared_array<OpenCL_Option> h_Options(new OpenCL_Option[numberOfOptions]);
+	const size_t size_h_Options = sizeof(OpenCL_Option);
+	// Allocate space for dynamic creation parameters
+	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[numberOfThreads]);
+	const size_t size_h_mtParams = sizeof(mt_params_stripped);
+
+	//Give our option some values
+	h_Options[0].X = 20.0f;
+	h_Options[0].S = 40.0f;
+	h_Options[0].V = 0.1f;
+	h_Options[0].R = 0.05f;
+	h_Options[0].T = 1.0f;
+
+	loadMersenneTwisterParams("data/MersenneTwister.dat", seed, h_mtParams.get(), numberOfThreads);
+
+	std::ifstream kernel_file("mcsimulation.cl");
+	std::string kernel_string(std::istreambuf_iterator<char>(kernel_file), (std::istreambuf_iterator<char>()));
+	kernel_file.close();
+	cl::Program::Sources sources(1, std::make_pair(kernel_string.c_str(), kernel_string.length()+1));
+	unsigned int programHandle = ocldevice->loadSources(sources);
+
+	//Allocate device buffers
+	unsigned int d_Options = ocldevice->allocateBuffer(h_Options.get(), size_h_Options);
+	unsigned int d_mtParams = ocldevice->allocateBuffer(h_mtParams.get(), size_h_mtParams);
+	
+	//Load the kernel, set arguments, and launch it
+	unsigned int kernelHandle = ocldevice->loadKernel(programHandle,"valueOptions");
+	ocldevice->setKernelArg(kernelHandle, 0, *(ocldevice->buffer(d_Options)));
+	ocldevice->setKernelArg(kernelHandle, 1, numberOfOptions);
+	ocldevice->setKernelArg(kernelHandle, 2, 10000UL);
+	ocldevice->setKernelArg(kernelHandle, 3, 10UL);
+	ocldevice->setKernelArg(kernelHandle, 4, *(ocldevice->buffer(d_mtParams)));
+	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 128);
+
+	// Wait for OpenCL execution to complete
+	ocldevice->wait(kernelEventHandle);
+
+	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
+	ocldevice->readBuffer(d_Options, h_Options.get());
+
+	std::cout << "Call value = " << h_Options[0].callValue << std::endl;
+}
+
 int main(int, char* []) {
 
     try {
@@ -289,6 +343,7 @@ int main(int, char* []) {
 		//test3(ocldevice1);
 		//test4(ocldevice1);
 		//test5(ocldevice1);
+		test6(ocldevice1);
 
         // set up dates
         Calendar calendar = TARGET();
@@ -361,7 +416,7 @@ int main(int, char* []) {
 		// Analytic formulas:
 
         // Monte Carlo Method: MC (crude)
-        Size timeSteps = 1;
+        Size timeSteps = 10;
         method = "MC (crude)";
         Size mcSeed = 42;
         boost::shared_ptr<PricingEngine> mcengine1;
@@ -380,7 +435,7 @@ int main(int, char* []) {
                   << std::endl;
 
 		// OpenCL Monte Carlo Method: MC (crude)
-        timeSteps = 1;
+        timeSteps = 10;
         method = "OpenCL MC (crude)";
         Size mcSeed2 = 42;
 		boost::shared_ptr<PricingEngine> mcengine2;
