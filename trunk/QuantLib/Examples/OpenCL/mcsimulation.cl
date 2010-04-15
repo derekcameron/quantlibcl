@@ -269,7 +269,7 @@ __kernel void valueOptions(__global Option* d_Options, const uint numberOfOption
     initializeMersenneTwister(mtParams, &mtState);
     
     OptionAccumulator accum;											//Stores the sum of all generated paths
-	float discountFactor = exp(option->R * option->T);					//Discount factor
+	float discountFactor = exp(-option->R * option->T);					//Discount factor
 	
 	accum.expectedCallValueSum = 0.0f;
 	accum.expectedPutValueSum = 0.0f;
