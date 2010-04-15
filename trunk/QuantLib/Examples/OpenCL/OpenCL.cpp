@@ -279,23 +279,32 @@ void test5(boost::shared_ptr<OclDevice> ocldevice) {
 void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	
 	//const parameters
-	const int seed = 777;
-	const uint32_t numberOfOptions = 64;
+	const int seed = 412412;
+	const uint32_t numberOfOptions = 32;
 	const uint32_t numberOfThreads = numberOfOptions;
+	const uint32_t numberOfPaths = 10000;
+	const uint32_t timeStepsPerPath = 10;
 
 	// Allocate space for the result
 	boost::shared_array<OpenCL_Option> h_Options(new OpenCL_Option[numberOfOptions]);
-	const size_t size_h_Options = sizeof(OpenCL_Option);
+	const size_t size_h_Options = sizeof(OpenCL_Option[numberOfOptions]);
 	// Allocate space for dynamic creation parameters
 	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[numberOfThreads]);
 	const size_t size_h_mtParams = sizeof(mt_params_stripped);
 
 	//Give our option some values
 	h_Options[0].X = 20.0f;
-	h_Options[0].S = 40.0f;
-	h_Options[0].V = 0.1f;
-	h_Options[0].R = 0.05f;
-	h_Options[0].T = 1.0f;
+	h_Options[0].S = 50.0f;
+	h_Options[0].V = 0.3f;
+	h_Options[0].R = 0.03f;
+	h_Options[0].T = 20.0f;
+
+	//Give our option some values
+	h_Options[1].X = 20.0f;
+	h_Options[1].S = 50.0f;
+	h_Options[1].V = 0.3f;
+	h_Options[1].R = 0.03f;
+	h_Options[1].T = 20.0f;
 
 	loadMersenneTwisterParams("data/MersenneTwister.dat", seed, h_mtParams.get(), numberOfThreads);
 
@@ -313,10 +322,10 @@ void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	unsigned int kernelHandle = ocldevice->loadKernel(programHandle,"valueOptions");
 	ocldevice->setKernelArg(kernelHandle, 0, *(ocldevice->buffer(d_Options)));
 	ocldevice->setKernelArg(kernelHandle, 1, numberOfOptions);
-	ocldevice->setKernelArg(kernelHandle, 2, 50000UL);	//Number of paths to generate
-	ocldevice->setKernelArg(kernelHandle, 3, 1000UL);	//Timesteps per path
+	ocldevice->setKernelArg(kernelHandle, 2, numberOfPaths);	//Number of paths to generate
+	ocldevice->setKernelArg(kernelHandle, 3, timeStepsPerPath);	//Timesteps per path
 	ocldevice->setKernelArg(kernelHandle, 4, *(ocldevice->buffer(d_mtParams)));
-	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 64);
+	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 32);
 
 	// Wait for OpenCL execution to complete
 	ocldevice->wait(kernelEventHandle);
@@ -324,7 +333,11 @@ void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
 	ocldevice->readBuffer(d_Options, h_Options.get());
 
-	std::cout << "Call value = " << h_Options[0].callValue << std::endl;
+	std::cout << "Option 1 call value = " << h_Options[0].callValue << std::endl;
+	std::cout << "Option 1 put value = " << h_Options[0].putValue << std::endl;
+
+	std::cout << "Option 2 call value = " << h_Options[1].callValue << std::endl;
+	std::cout << "Option 2 put value = " << h_Options[1].putValue << std::endl;
 }
 
 int main(int, char* []) {
