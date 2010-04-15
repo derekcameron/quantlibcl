@@ -280,7 +280,7 @@ void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	
 	//const parameters
 	const int seed = 777;
-	const uint32_t numberOfOptions = 128;
+	const uint32_t numberOfOptions = 64;
 	const uint32_t numberOfThreads = numberOfOptions;
 
 	// Allocate space for the result
@@ -313,10 +313,10 @@ void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	unsigned int kernelHandle = ocldevice->loadKernel(programHandle,"valueOptions");
 	ocldevice->setKernelArg(kernelHandle, 0, *(ocldevice->buffer(d_Options)));
 	ocldevice->setKernelArg(kernelHandle, 1, numberOfOptions);
-	ocldevice->setKernelArg(kernelHandle, 2, 10000UL);
-	ocldevice->setKernelArg(kernelHandle, 3, 10UL);
+	ocldevice->setKernelArg(kernelHandle, 2, 50000UL);	//Number of paths to generate
+	ocldevice->setKernelArg(kernelHandle, 3, 1000UL);	//Timesteps per path
 	ocldevice->setKernelArg(kernelHandle, 4, *(ocldevice->buffer(d_mtParams)));
-	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 128);
+	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 64);
 
 	// Wait for OpenCL execution to complete
 	ocldevice->wait(kernelEventHandle);
