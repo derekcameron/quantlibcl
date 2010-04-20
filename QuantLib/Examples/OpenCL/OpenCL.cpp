@@ -274,16 +274,15 @@ void test5(boost::shared_ptr<OclDevice> ocldevice) {
 	//WTF?!?!?
 }
 
-// Test 6 - Generate normally distributed random variables using the GPL'd NVIDIA Mersenne Twister algorithm
-// and a Box Muller transform
+// Test 6 - Compute the values of 32 options
 void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	
 	//const parameters
-	const int seed = 412412;
+	const int seed = 42;
 	const uint32_t numberOfOptions = 32;
 	const uint32_t numberOfThreads = numberOfOptions;
-	const uint32_t numberOfPaths = 10000;
-	const uint32_t timeStepsPerPath = 10;
+	const uint32_t numberOfPaths = 1000000;
+	const uint32_t timeStepsPerPath = 1000;
 
 	// Allocate space for the result
 	boost::shared_array<OpenCL_Option> h_Options(new OpenCL_Option[numberOfOptions]);
@@ -340,6 +339,165 @@ void test6(boost::shared_ptr<OclDevice> ocldevice) {
 	std::cout << "Option 2 put value = " << h_Options[1].putValue << std::endl;
 }
 
+// Test 7 - Calculate the values of 65536 randomly generated options using OpenCL
+// Then calculate the option values without OpenCL.  Compare the computation times.
+void test7(boost::shared_ptr<OclDevice> ocldevice) {
+
+	//const parameters
+	const int seed = 42;
+	const uint32_t numberOfOptions = 65536;
+	const uint32_t numberOfThreads = 1024;
+	const uint32_t numberOfPaths = 1000;
+	const uint32_t timeStepsPerPath = 10;
+
+	// Number of days to maturity for each option
+	boost::shared_array<int> daysToMaturity(new int[numberOfOptions]);
+
+	//Create a timer
+	boost::timer t0;
+	double clTime, nonClTime;
+
+	// Allocate space for the result
+	boost::shared_array<OpenCL_Option> h_Options(new OpenCL_Option[numberOfOptions]);
+	const size_t size_h_Options = sizeof(OpenCL_Option[numberOfOptions]);
+	// Allocate space for dynamic creation parameters
+	boost::shared_array<mt_params_stripped> h_mtParams(new mt_params_stripped[numberOfThreads]);
+	const size_t size_h_mtParams = sizeof(mt_params_stripped);
+
+	//Give our option some values
+	for(uint32_t i = 0; i < numberOfOptions; i++) {
+		daysToMaturity[i] = 1 + (int)(60.0 *(rand() / (RAND_MAX + 1.0)));	//An integer between 1 and 60
+		h_Options[i].X = 99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f;	//A number between 1.0 and 100.0
+		h_Options[i].S = 99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f;	//A number between 1.0 and 100.0
+		h_Options[i].V = 0.4f * (rand() / (RAND_MAX + 1.0)) + 0.1f;	//A number between 0.0 and 0.5
+		h_Options[i].R = 0.09f * (rand() / (RAND_MAX + 1.0)) + 0.01f;	//A number between 0.01 and 0.1
+		h_Options[i].T = daysToMaturity[i] / 365.0f;	//A number of days between 1 and 60
+	}
+
+	loadMersenneTwisterParams("data/MersenneTwister.dat", seed, h_mtParams.get(), numberOfThreads);
+
+	std::ifstream kernel_file("mcsimulation.cl");
+	std::string kernel_string(std::istreambuf_iterator<char>(kernel_file), (std::istreambuf_iterator<char>()));
+	kernel_file.close();
+	cl::Program::Sources sources(1, std::make_pair(kernel_string.c_str(), kernel_string.length()+1));
+	unsigned int programHandle = ocldevice->loadSources(sources);
+
+	//Allocate device buffers
+	unsigned int d_Options = ocldevice->allocateBuffer(h_Options.get(), size_h_Options);
+	unsigned int d_mtParams = ocldevice->allocateBuffer(h_mtParams.get(), size_h_mtParams);
+
+	//Load the kernel, set arguments, and launch it
+	unsigned int kernelHandle = ocldevice->loadKernel(programHandle,"valueOptions");
+	ocldevice->setKernelArg(kernelHandle, 0, *(ocldevice->buffer(d_Options)));
+	ocldevice->setKernelArg(kernelHandle, 1, numberOfOptions);
+	ocldevice->setKernelArg(kernelHandle, 2, numberOfPaths);	//Number of paths to generate
+	ocldevice->setKernelArg(kernelHandle, 3, timeStepsPerPath);	//Timesteps per path
+	ocldevice->setKernelArg(kernelHandle, 4, *(ocldevice->buffer(d_mtParams)));
+
+	std::cout << "Launching OpenCL simulation..." << std::endl;
+
+	t0.restart();	//restart our timer
+
+	unsigned int kernelEventHandle = ocldevice->launchKernel(kernelHandle, numberOfThreads, 32);
+
+	// Wait for OpenCL execution to complete
+	ocldevice->wait(kernelEventHandle);
+
+	clTime = t0.elapsed();
+
+	std::cout << "Completed OpenCL simulation in " << clTime << " seconds" << std::endl;
+
+	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
+	ocldevice->readBuffer(d_Options, h_Options.get());
+
+	// BEGIN OF NON-OPENCL TEST!!!
+	boost::shared_array< boost::shared_ptr<PricingEngine> > mcEngine(new boost::shared_ptr<PricingEngine>[numberOfOptions]);
+
+	Calendar calendar = TARGET();
+    Date todaysDate(31, March, 1998);
+    Date settlementDate(31, March, 1998);
+
+    boost::shared_array<Real> npv(new Real[numberOfOptions]);	//Somewhere to store the results
+    boost::shared_array< boost::shared_ptr<VanillaOption> > optionsArray(new boost::shared_ptr<VanillaOption>[numberOfOptions]);
+
+    for(uint32_t i = 0; i < numberOfOptions; i++) {
+    	 // set up dates
+    	        Calendar calendar = TARGET();
+    	        Settings::instance().evaluationDate() = todaysDate;
+
+    	        boost::shared_ptr<Exercise> europeanExercise;
+
+    	    	if(daysToMaturity[i] < 31) {
+    	    		Date maturity(daysToMaturity[i], April, 1998);
+    				boost::shared_ptr<Exercise> tmp(new EuropeanExercise(maturity));
+    				europeanExercise = tmp;
+    	    	}
+    	    	else {
+    				Date maturity(daysToMaturity[i]-30, May, 1998);
+    				boost::shared_ptr<Exercise> tmp(new EuropeanExercise(maturity));
+    				europeanExercise = tmp;
+    	    	}
+
+    	        Option::Type type(Option::Put);
+				Real underlying = h_Options[i].S;
+				Real strike = h_Options[i].X;
+				Spread dividendYield = 0.00;
+				Rate riskFreeRate = h_Options[i].R;
+				Volatility volatility = h_Options[i].V;
+				DayCounter dayCounter = Actual365Fixed();
+
+    	        Handle<Quote> underlyingH(
+    	            boost::shared_ptr<Quote>(new SimpleQuote(underlying)));
+
+    	        // bootstrap the yield/dividend/vol curves
+    	        Handle<YieldTermStructure> flatTermStructure(
+    	            boost::shared_ptr<YieldTermStructure>(
+    	                new FlatForward(settlementDate, riskFreeRate, dayCounter)));
+    	        Handle<YieldTermStructure> flatDividendTS(
+    	            boost::shared_ptr<YieldTermStructure>(
+    	                new FlatForward(settlementDate, dividendYield, dayCounter)));
+    	        Handle<BlackVolTermStructure> flatVolTS(
+    	            boost::shared_ptr<BlackVolTermStructure>(
+    	                new BlackConstantVol(settlementDate, calendar, volatility,
+    	                                     dayCounter)));
+    	        boost::shared_ptr<StrikedTypePayoff> payoff(
+    	                                        new PlainVanillaPayoff(type, strike));
+    	        boost::shared_ptr<BlackScholesMertonProcess> bsmProcess(
+    	                 new BlackScholesMertonProcess(underlyingH, flatDividendTS,
+    	                                               flatTermStructure, flatVolTS));
+
+    	        // options
+    	        boost::shared_ptr<VanillaOption> option(new VanillaOption(payoff, europeanExercise));
+
+    	        // Monte Carlo Method: MC (crude)
+    	        boost::shared_ptr<PricingEngine> mcengine1;
+    	        mcengine1 = MakeMCEuropeanEngine<PseudoRandom>(bsmProcess)
+    	            .withSteps(timeStepsPerPath)
+    	            .withSamples(numberOfPaths)
+    	            .withSeed(seed);
+    	        option->setPricingEngine(mcengine1);
+    	        // Real errorEstimate = europeanOption.errorEstimate();
+    	        optionsArray[i] = option;
+    	            }
+
+    //Run the Non-OpenCL simulation
+    std::cout << "Launching Non-OpenCL simulation..." << std::endl;
+
+    t0.restart();	//restart our timer
+    for(uint32_t j = 0; j < numberOfOptions; j++) {
+    	//Do calculations here
+        npv[j] = optionsArray[j]->NPV();
+    }
+
+    nonClTime = t0.elapsed();
+    std::cout << "Completed Non-OpenCL simulation in " << nonClTime << " seconds" << std::endl;
+
+    //Print first 50 results to screen
+	for(uint32_t j = 0; j < (numberOfOptions > 50 ? 50 : numberOfOptions); j++) {
+		std::cout << "Option " << j << ":  OpenCL put value = " << h_Options[j].putValue << ", non-OpenCL put value = " << npv[j] << std::endl;
+	}
+}
+
 int main(int, char* []) {
 
     try {
@@ -356,7 +514,8 @@ int main(int, char* []) {
 		//test3(ocldevice1);
 		//test4(ocldevice1);
 		//test5(ocldevice1);
-		test6(ocldevice1);
+		//test6(ocldevice1);
+		test7(ocldevice1);
 
         // set up dates
         Calendar calendar = TARGET();
@@ -395,10 +554,6 @@ int main(int, char* []) {
                   << std::setw(widths[2]) << std::left << "Bermudan"
                   << std::setw(widths[3]) << std::left << "American"
                   << std::endl;
-
-        std::vector<Date> exerciseDates;
-        for (Integer i=1; i<=4; i++)
-            exerciseDates.push_back(settlementDate + 3*i*Months);
 
         boost::shared_ptr<Exercise> europeanExercise(
                                          new EuropeanExercise(maturity));

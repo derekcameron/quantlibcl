@@ -58,7 +58,7 @@ namespace QuantLib {
 		void releaseKernel(unsigned int kernelHandle);
 		unsigned int allocateBuffer(void* ptr, const size_t bufferSize);
 		void releaseBuffer(unsigned int bufferHandle);
-		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize = 128);
+		unsigned int launchKernel(const unsigned int kernelHandle, const unsigned int numberOfThreads, const unsigned int localWorkSize = 0);
 		void wait(const unsigned int eventHandle);
 		void readBuffer(const unsigned int bufferHandle, void* dest);
 		boost::shared_ptr<cl::Buffer> buffer(unsigned int i);
