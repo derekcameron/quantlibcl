@@ -823,6 +823,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\mcsimulation.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\OpenCL.cpp"
 				>
 			</File>

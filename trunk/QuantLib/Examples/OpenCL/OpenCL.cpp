@@ -345,10 +345,10 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
 
 	//const parameters
 	const int seed = 42;
-	const uint32_t numberOfOptions = 65536;
-	const uint32_t numberOfThreads = 1024;
+	const uint32_t numberOfOptions = 8192;
+	const uint32_t numberOfThreads = 4096;
 	const uint32_t numberOfPaths = 1000;
-	const uint32_t timeStepsPerPath = 10;
+	const uint32_t timeStepsPerPath = 1;
 
 	// Number of days to maturity for each option
 	boost::shared_array<int> daysToMaturity(new int[numberOfOptions]);
@@ -367,10 +367,10 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
 	//Give our option some values
 	for(uint32_t i = 0; i < numberOfOptions; i++) {
 		daysToMaturity[i] = 1 + (int)(60.0 *(rand() / (RAND_MAX + 1.0)));	//An integer between 1 and 60
-		h_Options[i].X = 99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f;	//A number between 1.0 and 100.0
-		h_Options[i].S = 99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f;	//A number between 1.0 and 100.0
-		h_Options[i].V = 0.4f * (rand() / (RAND_MAX + 1.0)) + 0.1f;	//A number between 0.0 and 0.5
-		h_Options[i].R = 0.09f * (rand() / (RAND_MAX + 1.0)) + 0.01f;	//A number between 0.01 and 0.1
+		h_Options[i].X = (float)(99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f);	//A number between 1.0 and 100.0
+		h_Options[i].S = (float)(99.0f * (rand() / (RAND_MAX + 1.0)) + 1.0f);	//A number between 1.0 and 100.0
+		h_Options[i].V = (float)(0.4f * (rand() / (RAND_MAX + 1.0)) + 0.1f);	//A number between 0.0 and 0.5
+		h_Options[i].R = (float)(0.09f * (rand() / (RAND_MAX + 1.0)) + 0.01f);	//A number between 0.01 and 0.1
 		h_Options[i].T = daysToMaturity[i] / 365.0f;	//A number of days between 1 and 60
 	}
 
