@@ -345,17 +345,17 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
 
 	//const parameters
 	const int seed = 42;
-	const uint32_t numberOfOptions = 8192;
-	const uint32_t numberOfThreads = 4096;
-	const uint32_t numberOfPaths = 1000;
-	const uint32_t timeStepsPerPath = 1;
+	const uint32_t numberOfOptions = 65536;
+	const uint32_t numberOfThreads = 16384;
+	const uint32_t numberOfPaths = 10000;
+	const uint32_t timeStepsPerPath = 10;
 
 	// Number of days to maturity for each option
 	boost::shared_array<int> daysToMaturity(new int[numberOfOptions]);
 
 	//Create a timer
 	boost::timer t0;
-	double clTime, nonClTime;
+	double clTime, scalarTime, quantlibTime;
 
 	// Allocate space for the result
 	boost::shared_array<OpenCL_Option> h_Options(new OpenCL_Option[numberOfOptions]);
@@ -410,7 +410,16 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
 	// Copy the result from the device buffer (d_RandGPU) to the host buffer (h_RandGPU)
 	ocldevice->readBuffer(d_Options, h_Options.get());
 
-	// BEGIN OF NON-OPENCL TEST!!!
+    //Run the scalar simulation
+    std::cout << "Launching scalar CPU-based simulation..." << std::endl;
+
+    t0.restart();	//restart our timer
+    valueOptions(h_Options.get(), numberOfOptions, numberOfPaths, timeStepsPerPath, h_mtParams.get());
+
+    scalarTime = t0.elapsed();
+    std::cout << "Completed scalar CPU-based simulation in " << scalarTime << " seconds" << std::endl;
+
+	// BEGIN OF QuantLib TEST!!!
 	boost::shared_array< boost::shared_ptr<PricingEngine> > mcEngine(new boost::shared_ptr<PricingEngine>[numberOfOptions]);
 
 	Calendar calendar = TARGET();
@@ -480,8 +489,8 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
     	        optionsArray[i] = option;
     	            }
 
-    //Run the Non-OpenCL simulation
-    std::cout << "Launching Non-OpenCL simulation..." << std::endl;
+    //Run the QuantLib simulation
+    std::cout << "Launching QuantLib simulation..." << std::endl;
 
     t0.restart();	//restart our timer
     for(uint32_t j = 0; j < numberOfOptions; j++) {
@@ -489,8 +498,8 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
         npv[j] = optionsArray[j]->NPV();
     }
 
-    nonClTime = t0.elapsed();
-    std::cout << "Completed Non-OpenCL simulation in " << nonClTime << " seconds" << std::endl;
+    quantlibTime = t0.elapsed();
+    std::cout << "Completed QuantLib simulation in " << quantlibTime << " seconds" << std::endl;
 
     //Print first 50 results to screen
 	for(uint32_t j = 0; j < (numberOfOptions > 50 ? 50 : numberOfOptions); j++) {
