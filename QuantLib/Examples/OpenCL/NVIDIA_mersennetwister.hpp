@@ -10,11 +10,4 @@
 // Total # of rvs that will be generated
 #define NVIDIA_nRand (NVIDIA_MT_RNG_COUNT * NVIDIA_RVs_PER_THREAD)
 
-typedef struct {
-  unsigned int matrix_a;
-  unsigned int mask_b;
-  unsigned int mask_c;
-  unsigned int seed;
-} mt_params_stripped;
-
 #endif

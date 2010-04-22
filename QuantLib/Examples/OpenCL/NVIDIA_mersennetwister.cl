@@ -13,13 +13,6 @@
  * 
  */
 
-typedef struct{
-  unsigned int matrix_a;
-  unsigned int mask_b;
-  unsigned int mask_c;
-  unsigned int seed;
-} mt_struct_stripped;
-
 #define   MT_RNG_COUNT 4096
 #define          MT_MM 9
 #define          MT_NN 19

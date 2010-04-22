@@ -20,7 +20,7 @@
 #include "mcsimulation.hpp"
 #include <math.h>
 
-void initializeMersenneTwister(const mt_struct_stripped* mtParams, mt_state* mtState) {
+void initializeMersenneTwister(const mt_params_stripped* mtParams, mt_state* mtState) {
     //Initialize current state
     mtState->mt[0] = mtParams->seed;
     for (mtState->iState = 1; mtState->iState < MT_NN; mtState->iState++)
@@ -42,7 +42,7 @@ inline float vanillaPutPayoff(const float S, const float X) {
 
 inline void MersenneTwister_Bulk(float* randOutput,
 			      const size_t count,
-			      const mt_struct_stripped* mtParams,
+			      const mt_params_stripped* mtParams,
 			      mt_state* mtState)
 {
 	//The following variables are not part of the Mersenne Twister's state
@@ -183,7 +183,7 @@ inline void AcklamInvCND_Bulk(float* randOutput, const size_t bufferLength) {
     }
 }
 
-inline float generateLognormalPath(OpenCL_Option* option, const uint32_t timeSteps, const mt_struct_stripped* mtParams, mt_state* mtState) {
+inline float generateLognormalPath(OpenCL_Option* option, const uint32_t timeSteps, const mt_params_stripped* mtParams, mt_state* mtState) {
 	const float dt = option->T / (float)timeSteps;
 
 	float path = option->S;
@@ -201,10 +201,10 @@ inline float generateLognormalPath(OpenCL_Option* option, const uint32_t timeSte
 	return path;
 }
 
-void valueOptions(OpenCL_Option* d_Options, const uint32_t numberOfOptions, const uint32_t pathsPerOption, const uint32_t timeStepsPerOption, mt_struct_stripped* d_MT) {
+void valueOptions(OpenCL_Option* d_Options, const uint32_t numberOfOptions, const uint32_t pathsPerOption, const uint32_t timeStepsPerOption, mt_params_stripped* d_MT) {
 	for(size_t globalID = 0; globalID < numberOfOptions; globalID++) {
 		OpenCL_Option* option = &d_Options[globalID];						//Pointer to this thread's allocated buffer
-		const mt_struct_stripped* mtParams = &d_MT[globalID];		//Pointer to this thread's mtParams struct
+		const mt_params_stripped* mtParams = &d_MT[globalID];		//Pointer to this thread's mtParams struct
 		mt_state mtState;													//Stores the Mersenne Twister state between calls to the MersenneTwister function
 
 		initializeMersenneTwister(mtParams, &mtState);

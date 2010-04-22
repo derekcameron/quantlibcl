@@ -35,4 +35,11 @@ typedef struct {
 	int shift0, shift1, shiftB, shiftC;
 } mt_params;
 
+typedef struct{
+  uint32_t matrix_a;
+  uint32_t mask_b;
+  uint32_t mask_c;
+  uint32_t seed;
+} mt_params_stripped;
+
 #endif
