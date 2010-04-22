@@ -7,7 +7,7 @@ TESTS = OpenCL$(EXEEXT)
 else
 noinst_PROGRAMS = OpenCL
 endif
-OpenCL_SOURCES = OpenCL.cpp dcmt.cpp 
+OpenCL_SOURCES = OpenCL.cpp dcmt.cpp mcsimulation.cpp
 OpenCL_LDADD = ../../ql/libQuantLib.la
 OpenCL_LDFLAGS = -lpthread
 
