@@ -24,6 +24,14 @@
 #ifndef quantlib_opencl_example_mcsimulation_hpp
 #define quantlib_opencl_example_mcsimulation_hpp
 
+#include "mt_params.h"
+
+#define      MT_SHIFT0 12
+#define      MT_SHIFTB 7
+#define      MT_SHIFTC 15
+#define      MT_SHIFT1 18
+#define PI 3.14159265358979f
+
 typedef struct {
 	float S;			//Underlying spot price at t=0
 	float X;			//Exercise price
@@ -34,4 +42,35 @@ typedef struct {
 	float putValue;		//Value of a put option
 } OpenCL_Option;
 
+typedef struct{
+  uint32_t matrix_a;
+  uint32_t mask_b;
+  uint32_t mask_c;
+  uint32_t seed;
+} mt_struct_stripped;
+
+typedef struct {
+    int iState, iState1, iStateM;
+    uint32_t mti1;
+    uint32_t mt[MT_NN];
+} mt_state;
+
+typedef struct {
+	float expectedCallValueSum;
+	float expectedPutValueSum;
+	float callValueErrorEstimate;
+	float putValueErrorEstimate;
+} OptionAccumulator;
+
+void initializeMersenneTwister(const mt_struct_stripped* mtParams, mt_state* mtState);
+inline float vanillaCallPayoff(const float S, const float X);
+inline float vanillaPutPayoff(const float S, const float X);
+inline void MersenneTwister_Bulk(float* randOutput,
+			      const size_t count,
+			      const mt_struct_stripped* mtParams,
+			      mt_state* mtState);
+inline float AcklamInvCND(float input);
+inline void AcklamInvCND_Bulk(float* randOutput, const size_t bufferLength);
+inline float generateLognormalPath(OpenCL_Option* option, const uint32_t timeSteps, const mt_struct_stripped* mtParams, mt_state* mtState);
+void valueOptions(OpenCL_Option* d_Options, const uint32_t numberOfOptions, const uint32_t pathsPerOption, const uint32_t timeStepsPerOption, mt_struct_stripped* d_MT);
 #endif
