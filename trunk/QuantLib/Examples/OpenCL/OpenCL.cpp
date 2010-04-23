@@ -53,7 +53,7 @@ namespace QuantLib {
 }
 #endif
 
-#define OCL_THREAD_TOTAL 1024
+#define OCL_THREAD_TOTAL 16384
 
 // Test 1 - Launch parallel threads that write consecutive integers into an array
 void test1(boost::shared_ptr<OclDevice> ocldevice1) {
@@ -346,9 +346,9 @@ void test7(boost::shared_ptr<OclDevice> ocldevice) {
 	//const parameters
 	const int seed = 42;
 	const uint32_t numberOfOptions = 65536;
-	const uint32_t numberOfThreads = 16384;
+	const uint32_t numberOfThreads = 4096;
 	const uint32_t numberOfPaths = 10000;
-	const uint32_t timeStepsPerPath = 10;
+	const uint32_t timeStepsPerPath = 1;
 
 	// Number of days to maturity for each option
 	boost::shared_array<int> daysToMaturity(new int[numberOfOptions]);

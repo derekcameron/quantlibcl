@@ -1,7 +1,7 @@
 #ifndef mt_params_h
 #define mt_params_h
 
-#include <boost/cstdint.hpp>
+#include "typedefs.h"
 
 //Period parameters
 #define MT_NN 19
