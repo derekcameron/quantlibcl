@@ -1,0 +1,3 @@
+The MCLongstaffSchwartzEngine class is a Monte Carlo simulation engine implementing the algorithm described by Longstaff and Schwartz in [Valuing American Options by Simulation: A Simple Least-Squares Approach](http://rfs.oxfordjournals.org/cgi/content/abstract/14/1/113)
+
+An (unauthorized?) copy of this paper can be found [here](http://www.math.ethz.ch/~hjfurrer/teaching/LongstaffSchwartzAmericanOptionsLeastSquareMonteCarlo.pdf).

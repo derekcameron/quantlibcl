@@ -1,0 +1,1 @@
+The [MCAmericanEngine](http://quantlib.org/reference/class_quant_lib_1_1_m_c_american_engine.html) class is a Monte Carlo pricing engine for American options.  This implementation uses the [MCLongstaffSchwartz](MCLongstaffSchwartz.md) engine.
